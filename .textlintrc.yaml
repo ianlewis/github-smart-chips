@@ -62,3 +62,16 @@ rules:
       - "/\\b[Vv]irtualenv\\b/g"
       - "/\\bv?[0-9]+\\b/g"
       - ":white_check_mark:"
+
+      # GitHub Smart Chips specific terms
+      - "/\\bOAuth2?\\b/g"
+      - "/\\bOctocat\\b/g"
+      - "/\\bgithub\\.com\\b/g"
+      - "/\\brepo\\b/g"
+      - "/\\bnpm\\b/g"
+      - "/\\bclasp\\b/g"
+      - "/\\bGITHUB_CLIENT_(ID|SECRET)\\b/g"
+      - "/\\bappsscript\\.json\\b/g"
+      - "/\\bhttps?\\b/g"
+      - "/\\bAdd-ons?\\b/g"
+      - "/\\badd-on'?s?\\b/g"

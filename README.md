@@ -71,8 +71,8 @@ src/
 1. Create a new Google Apps Script project
 2. Enable the OAuth2 library (version 44)
 3. Set script properties:
-   - `GITHUB_CLIENT_ID`: Your GitHub OAuth App client ID
-   - `GITHUB_CLIENT_SECRET`: Your GitHub OAuth App client secret
+    - `GITHUB_CLIENT_ID`: Your GitHub OAuth App client ID
+    - `GITHUB_CLIENT_SECRET`: Your GitHub OAuth App client secret
 
 ### Upload Files
 
@@ -95,4 +95,3 @@ Upload the compiled JavaScript files from the `lib/` directory and the
 
 Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for
 details.
-
