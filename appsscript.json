@@ -43,6 +43,10 @@
             {
               "hostPattern": "github.com",
               "pathPrefix": "*/*/pull/*"
+            },
+            {
+              "hostPattern": "github.com",
+              "pathPrefix": "*/*"
             }
           ]
         }

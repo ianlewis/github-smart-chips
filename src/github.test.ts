@@ -39,15 +39,29 @@ describe("parseGitHubURL", () => {
     expect(result?.type).toBe(GitHubResourceType.PullRequest);
   });
 
-  it("should return null for non-GitHub URLs", () => {
-    const url = "https://example.com/some/path";
+  it("should parse GitHub repository URLs", () => {
+    const url = "https://github.com/owner/repo";
     const result = parseGitHubURL(url);
 
-    expect(result).toBeNull();
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
+    expect(result?.number).toBeUndefined();
+    expect(result?.type).toBe(GitHubResourceType.Repository);
   });
 
-  it("should return null for invalid GitHub URLs", () => {
-    const url = "https://github.com/owner/repo";
+  it("should parse GitHub repository URLs with trailing slash", () => {
+    const url = "https://github.com/owner/repo/";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
+    expect(result?.type).toBe(GitHubResourceType.Repository);
+  });
+
+  it("should return null for non-GitHub URLs", () => {
+    const url = "https://example.com/some/path";
     const result = parseGitHubURL(url);
 
     expect(result).toBeNull();
@@ -62,5 +76,23 @@ describe("parseGitHubURL", () => {
     expect(result?.repo).toBe("repo");
     expect(result?.number).toBe(123);
     expect(result?.type).toBe(GitHubResourceType.Issue);
+  });
+
+  it("should prioritize issue URLs over repository URLs", () => {
+    const url = "https://github.com/owner/repo/issues/789";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.type).toBe(GitHubResourceType.Issue);
+    expect(result?.number).toBe(789);
+  });
+
+  it("should prioritize PR URLs over repository URLs", () => {
+    const url = "https://github.com/owner/repo/pull/101";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.type).toBe(GitHubResourceType.PullRequest);
+    expect(result?.number).toBe(101);
   });
 });

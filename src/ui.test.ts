@@ -14,11 +14,11 @@
 
 import { describe, it, expect } from "@jest/globals";
 import { createSmartChip } from "./ui.js";
-import { GitHubResourceType, type GitHubIssueOrPR } from "./types.js";
+import { GitHubResourceType, type GitHubResource } from "./types.js";
 
 describe("createSmartChip", () => {
   it("should create a smart chip for an issue", () => {
-    const data: GitHubIssueOrPR = {
+    const data: GitHubResource = {
       owner: "octocat",
       repo: "hello-world",
       number: 123,
@@ -38,7 +38,7 @@ describe("createSmartChip", () => {
   });
 
   it("should create a smart chip for a PR", () => {
-    const data: GitHubIssueOrPR = {
+    const data: GitHubResource = {
       owner: "octocat",
       repo: "hello-world",
       number: 456,
@@ -54,6 +54,24 @@ describe("createSmartChip", () => {
 
     expect(chip.text).toBe("octocat/hello-world PR #456");
     expect(chip.title).toBe("Test PR");
+    expect(chip.iconUrl).toBeDefined();
+  });
+
+  it("should create a smart chip for a repository", () => {
+    const data: GitHubResource = {
+      owner: "octocat",
+      repo: "hello-world",
+      description: "A test repository",
+      type: GitHubResourceType.Repository,
+    };
+
+    const chip = createSmartChip(
+      "https://github.com/octocat/hello-world",
+      data,
+    );
+
+    expect(chip.text).toBe("octocat/hello-world");
+    expect(chip.title).toBe("A test repository");
     expect(chip.iconUrl).toBeDefined();
   });
 });

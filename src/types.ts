@@ -20,6 +20,8 @@ export enum GitHubResourceType {
   Issue = "issue",
   // eslint-disable-next-line no-unused-vars
   PullRequest = "pull_request",
+  // eslint-disable-next-line no-unused-vars
+  Repository = "repository",
 }
 
 /**
@@ -31,8 +33,23 @@ export interface GitHubIssueOrPR {
   number: number;
   title: string;
   state: string;
-  type: GitHubResourceType;
+  type: GitHubResourceType.Issue | GitHubResourceType.PullRequest;
 }
+
+/**
+ * GitHub repository data
+ */
+export interface GitHubRepository {
+  owner: string;
+  repo: string;
+  description: string;
+  type: GitHubResourceType.Repository;
+}
+
+/**
+ * Union type for all GitHub resources
+ */
+export type GitHubResource = GitHubIssueOrPR | GitHubRepository;
 
 /**
  * Parsed GitHub URL information
@@ -40,6 +57,6 @@ export interface GitHubIssueOrPR {
 export interface GitHubURLInfo {
   owner: string;
   repo: string;
-  number: number;
+  number?: number;
   type: GitHubResourceType;
 }
