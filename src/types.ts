@@ -12,6 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Export all public functions for Apps Script
-export { onLinkPreview } from "./addon.js";
-export { authCallback, getAuthorizationUrl, resetAuth } from "./oauth.js";
+/**
+ * GitHub issue or pull request data
+ */
+export interface GitHubIssueOrPR {
+  owner: string;
+  repo: string;
+  number: number;
+  title: string;
+  state: string;
+  isPullRequest: boolean;
+}
+
+/**
+ * Parsed GitHub URL information
+ */
+export interface GitHubURLInfo {
+  owner: string;
+  repo: string;
+  number: number;
+  isPullRequest: boolean;
+}

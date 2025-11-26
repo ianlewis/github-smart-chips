@@ -1,0 +1,52 @@
+{
+  "timeZone": "America/New_York",
+  "dependencies": {
+    "libraries": [
+      {
+        "userSymbol": "OAuth2",
+        "version": "44",
+        "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/documents",
+    "https://www.googleapis.com/auth/script.external_request"
+  ],
+  "addOns": {
+    "common": {
+      "name": "GitHub Smart Chips",
+      "logoUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+      "layoutProperties": {
+        "primaryColor": "#24292e",
+        "secondaryColor": "#586069"
+      },
+      "homepageTrigger": {
+        "runFunction": "onLinkPreview"
+      },
+      "universalActions": [],
+      "openLinkUrlPrefixes": [
+        "https://github.com/"
+      ]
+    },
+    "docs": {
+      "linkPreviewTriggers": [
+        {
+          "runFunction": "onLinkPreview",
+          "patterns": [
+            {
+              "hostPattern": "github.com",
+              "pathPrefix": "*/*/issues/*"
+            },
+            {
+              "hostPattern": "github.com",
+              "pathPrefix": "*/*/pull/*"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
