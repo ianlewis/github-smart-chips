@@ -1,0 +1,64 @@
+# Copyright 2025 Ian Lewis
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+plugin:
+  - id: "@textlint/textlint-plugin-text"
+  - id: "@textlint/textlint-plugin-markdown"
+filters:
+  comments: true
+rules:
+  spelling:
+    language: "en"
+    skipPatterns:
+      # Terminology
+      - "/\\bCodecov\\b/" # Code coverage service
+      - "/\\bESM\\b/" # ECMAScript Modules
+
+      - "/\\bAMD64\\b/g"
+      - "/\\bARM64\\b/g"
+      - "/\\b(CHANGELOG|Changelog)\\b/g"
+      - "/\\bCODEOWNER\\b/g"
+      - "/\\bCLA\\b/g"
+      - "/\\bCLI\\b/g"
+      - "/\\bCVSS\\b/g"
+      - "/\\bDCO\\b/g"
+      - "/\\bPRs?\\b/g"
+      - "/\\bUI\\b/g"
+      - "/\\bYAML\\b/g"
+      - "/\\bCodeQL\\b/g"
+      - "/\\bDependabot\\b/g"
+      - "/\\bHomebrew\\b/g"
+      - "/\\bJavaScript\\b/g"
+      - "/\\bMakefile\\b/g"
+      - "/\\bNode.js\\b/g"
+      - "/\\bOpenSSF\\b/g"
+      - "/\\bTODOs?\\b/g"
+      - "/\\be2e\\b/g"
+      - "/\\bmacOS\\b/g"
+      - "/\\bx86-64\\b/g"
+      - "/\\b[Ff]ormatters?\\b/g"
+      - "/\\b[Ll]inters?\\b/g"
+      - "/\\b[Pp]ositivity\\b/g"
+      - "/\\b[Pp]re\\b/g"
+      - "/\\b[Rr]ebase\\b/g"
+      - "/\\b[Rr]eproducibility\\b/g"
+      - "/\\b[Rr]ulesets?\\b/g"
+      - "/\\b[Rr]untimes?\\b/g"
+      - "/\\b[Ss]exualized\\b/g"
+      - "/\\b[Ss]ocio-economic\\b/g"
+      - "/\\b[Uu]serspace\\b/g"
+      - "/\\b[Vv]endored\\b/g"
+      - "/\\b[Vv]irtualenv\\b/g"
+      - "/\\bv?[0-9]+\\b/g"
+      - ":white_check_mark:"
