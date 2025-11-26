@@ -44,15 +44,21 @@ This will generate JavaScript files in the `lib/` directory.
 
 ## Add OAuth2 Library
 
+The OAuth2 library is required for GitHub authentication.
+
 1. In your Apps Script project, click the "+" next to Libraries
 2. Enter the Script ID: `1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF`
 3. Click "Look up"
-4. Select version 44
+4. Select the latest version (version 44 or higher)
 5. Click "Add"
+
+**Note:** Verify the library ID and version in the [official OAuth2 for Apps
+Script
+repository](https://github.com/googleworkspace/apps-script-oauth2#readme).
 
 ## Upload Files
 
-### Using clasp (Command Line)
+Use `clasp` to deploy the code to Google Apps Script.
 
 ```bash
 # Install clasp
@@ -74,19 +80,6 @@ cp appsscript.json <clasp-project-directory>/
 cd <clasp-project-directory>
 clasp push
 ```
-
-### Manual Upload
-
-1. In your Apps Script project, create new files for each `.js` file in `lib/`:
-   - `addon.js`
-   - `github.js`
-   - `oauth.js`
-   - `types.js`
-   - `ui.js`
-   - `index.js`
-2. Copy the contents from each file in `lib/` to the corresponding file in Apps
-   Script
-3. Replace the `appsscript.json` manifest with the one from this project
 
 ## Configure Script Properties
 

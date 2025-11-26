@@ -13,6 +13,16 @@
 // limitations under the License.
 
 /**
+ * GitHub resource type
+ */
+export enum GitHubResourceType {
+  // eslint-disable-next-line no-unused-vars
+  Issue = "issue",
+  // eslint-disable-next-line no-unused-vars
+  PullRequest = "pull_request",
+}
+
+/**
  * GitHub issue or pull request data
  */
 export interface GitHubIssueOrPR {
@@ -21,7 +31,7 @@ export interface GitHubIssueOrPR {
   number: number;
   title: string;
   state: string;
-  isPullRequest: boolean;
+  type: GitHubResourceType;
 }
 
 /**
@@ -31,5 +41,5 @@ export interface GitHubURLInfo {
   owner: string;
   repo: string;
   number: number;
-  isPullRequest: boolean;
+  type: GitHubResourceType;
 }

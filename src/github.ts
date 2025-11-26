@@ -12,27 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type { GitHubIssueOrPR, GitHubURLInfo } from "./types.js";
+import {
+  GitHubResourceType,
+  type GitHubIssueOrPR,
+  type GitHubURLInfo,
+} from "./types.js";
 
 /**
  * Parse a GitHub URL to extract owner, repo, and issue/PR number
  */
 export function parseGitHubURL(url: string): GitHubURLInfo | null {
-  const patterns = [
-    /github\.com\/([^/]+)\/([^/]+)\/issues\/(\d+)/,
-    /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/,
-  ];
+  const issuePattern = /github\.com\/([^/]+)\/([^/]+)\/issues\/(\d+)/;
+  const pullPattern = /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
 
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match) {
-      return {
-        owner: match[1],
-        repo: match[2],
-        number: parseInt(match[3], 10),
-        isPullRequest: url.includes("/pull/"),
-      };
-    }
+  let match = url.match(pullPattern);
+  if (match) {
+    return {
+      owner: match[1],
+      repo: match[2],
+      number: parseInt(match[3], 10),
+      type: GitHubResourceType.PullRequest,
+    };
+  }
+
+  match = url.match(issuePattern);
+  if (match) {
+    return {
+      owner: match[1],
+      repo: match[2],
+      number: parseInt(match[3], 10),
+      type: GitHubResourceType.Issue,
+    };
   }
 
   return null;
@@ -45,7 +55,8 @@ export function fetchGitHubData(
   urlInfo: GitHubURLInfo,
   accessToken: string,
 ): GitHubIssueOrPR | null {
-  const endpoint = urlInfo.isPullRequest ? "pulls" : "issues";
+  const endpoint =
+    urlInfo.type === GitHubResourceType.PullRequest ? "pulls" : "issues";
   const apiUrl = `https://api.github.com/repos/${urlInfo.owner}/${urlInfo.repo}/${endpoint}/${urlInfo.number}`;
 
   try {
@@ -72,7 +83,7 @@ export function fetchGitHubData(
       number: urlInfo.number,
       title: data.title || "",
       state: data.state || "unknown",
-      isPullRequest: urlInfo.isPullRequest,
+      type: urlInfo.type,
     };
   } catch (error) {
     // eslint-disable-next-line no-console

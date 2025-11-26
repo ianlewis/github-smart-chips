@@ -66,18 +66,8 @@ src/
 
 ## Deployment
 
-### Configuration
-
-1. Create a new Google Apps Script project
-2. Enable the OAuth2 library (version 44)
-3. Set script properties:
-    - `GITHUB_CLIENT_ID`: Your GitHub OAuth App client ID
-    - `GITHUB_CLIENT_SECRET`: Your GitHub OAuth App client secret
-
-### Upload Files
-
-Upload the compiled JavaScript files from the `lib/` directory and the
-`appsscript.json` manifest to your Apps Script project.
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions and
+[CONFIGURATION.md](CONFIGURATION.md) for configuration details.
 
 ## Usage
 

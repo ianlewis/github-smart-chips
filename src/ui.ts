@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import type { GitHubIssueOrPR } from "./types.js";
+import { GitHubResourceType, type GitHubIssueOrPR } from "./types.js";
 
 // GitHub Octocat logo image as base64 data URL
 const GITHUB_LOGO =
@@ -24,7 +24,7 @@ const GITHUB_LOGO =
 export function createPreviewCard(
   data: GitHubIssueOrPR,
 ): GoogleAppsScript.Card_Service.Card {
-  const type = data.isPullRequest ? "PR" : "Issue";
+  const type = data.type === GitHubResourceType.PullRequest ? "PR" : "Issue";
   const title = `${data.owner}/${data.repo} #${data.number}`;
   const subtitle = `${type}: ${data.title}`;
 
@@ -45,7 +45,7 @@ export function createSmartChip(
   url: string,
   data: GitHubIssueOrPR,
 ): Record<string, unknown> {
-  const type = data.isPullRequest ? "PR" : "Issue";
+  const type = data.type === GitHubResourceType.PullRequest ? "PR" : "Issue";
   const chipText = `${data.owner}/${data.repo} ${type} #${data.number}`;
 
   return {

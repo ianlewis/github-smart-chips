@@ -8,13 +8,13 @@ add-on.
 The following script properties must be configured in your Google Apps Script
 project:
 
-### GITHUB_CLIENT_ID
+### `GITHUB_CLIENT_ID`
 
 Your GitHub OAuth App Client ID.
 
 **How to get it:**
 
-1. Go to <https://github.com/settings/developers>
+1. Go to [`https://github.com/settings/developers`](https://github.com/settings/developers)
 2. Click on your OAuth App (or create a new one)
 3. Copy the Client ID
 
@@ -24,13 +24,13 @@ Your GitHub OAuth App Client ID.
 Iv1.abc123def456
 ```
 
-### GITHUB_CLIENT_SECRET
+### `GITHUB_CLIENT_SECRET`
 
 Your GitHub OAuth App Client Secret.
 
 **How to get it:**
 
-1. Go to <https://github.com/settings/developers>
+1. Go to [`https://github.com/settings/developers`](https://github.com/settings/developers)
 2. Click on your OAuth App
 3. Generate a new client secret (or use an existing one)
 4. Copy the secret immediately (it won't be shown again)
@@ -74,14 +74,15 @@ reference during development.
 
 The add-on requests the following OAuth scopes from GitHub:
 
-- `repo`: Full control of private repositories (required to access private
-  issues and pull requests)
+- `public_repo`: Access to public repositories (allows reading public issues and
+  pull requests)
 
-You can customize the scope in `src/oauth.ts` if you only want to support
-public repositories:
+**Note:** This scope provides read-only access to public repositories. If you
+need to support private repositories, you can change the scope to `repo` in
+`src/oauth.ts`, but note that this grants full control of private repositories.
 
 ```typescript
-.setScope("public_repo")  // For public repositories only
+.setScope("repo")  // For private repositories (full access)
 ```
 
 ## Security Recommendations

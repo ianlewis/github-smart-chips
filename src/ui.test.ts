@@ -14,7 +14,7 @@
 
 import { describe, it, expect } from "@jest/globals";
 import { createSmartChip } from "./ui.js";
-import type { GitHubIssueOrPR } from "./types.js";
+import { GitHubResourceType, type GitHubIssueOrPR } from "./types.js";
 
 describe("createSmartChip", () => {
   it("should create a smart chip for an issue", () => {
@@ -24,7 +24,7 @@ describe("createSmartChip", () => {
       number: 123,
       title: "Test Issue",
       state: "open",
-      isPullRequest: false,
+      type: GitHubResourceType.Issue,
     };
 
     const chip = createSmartChip(
@@ -44,7 +44,7 @@ describe("createSmartChip", () => {
       number: 456,
       title: "Test PR",
       state: "open",
-      isPullRequest: true,
+      type: GitHubResourceType.PullRequest,
     };
 
     const chip = createSmartChip(

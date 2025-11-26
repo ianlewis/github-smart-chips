@@ -75,3 +75,4 @@ rules:
       - "/\\bhttps?\\b/g"
       - "/\\bAdd-ons?\\b/g"
       - "/\\badd-on'?s?\\b/g"
+      - "/\\.md\\b/g"

@@ -14,6 +14,7 @@
 
 import { describe, it, expect } from "@jest/globals";
 import { parseGitHubURL } from "./github.js";
+import { GitHubResourceType } from "./types.js";
 
 describe("parseGitHubURL", () => {
   it("should parse GitHub issue URLs", () => {
@@ -24,7 +25,7 @@ describe("parseGitHubURL", () => {
     expect(result?.owner).toBe("owner");
     expect(result?.repo).toBe("repo");
     expect(result?.number).toBe(123);
-    expect(result?.isPullRequest).toBe(false);
+    expect(result?.type).toBe(GitHubResourceType.Issue);
   });
 
   it("should parse GitHub PR URLs", () => {
@@ -35,7 +36,7 @@ describe("parseGitHubURL", () => {
     expect(result?.owner).toBe("owner");
     expect(result?.repo).toBe("repo");
     expect(result?.number).toBe(456);
-    expect(result?.isPullRequest).toBe(true);
+    expect(result?.type).toBe(GitHubResourceType.PullRequest);
   });
 
   it("should return null for non-GitHub URLs", () => {
@@ -60,6 +61,6 @@ describe("parseGitHubURL", () => {
     expect(result?.owner).toBe("owner");
     expect(result?.repo).toBe("repo");
     expect(result?.number).toBe(123);
-    expect(result?.isPullRequest).toBe(false);
+    expect(result?.type).toBe(GitHubResourceType.Issue);
   });
 });
