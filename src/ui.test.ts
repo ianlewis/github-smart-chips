@@ -1,0 +1,77 @@
+// Copyright 2025 Ian Lewis
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+import { describe, it, expect } from "@jest/globals";
+import { createSmartChip } from "./ui.js";
+import { GitHubResourceType, type GitHubResource } from "./types.js";
+
+describe("createSmartChip", () => {
+  it("should create a smart chip for an issue", () => {
+    const data: GitHubResource = {
+      owner: "octocat",
+      repo: "hello-world",
+      number: 123,
+      title: "Test Issue",
+      state: "open",
+      type: GitHubResourceType.Issue,
+    };
+
+    const chip = createSmartChip(
+      "https://github.com/octocat/hello-world/issues/123",
+      data,
+    );
+
+    expect(chip.text).toBe("octocat/hello-world Issue #123");
+    expect(chip.title).toBe("Test Issue");
+    expect(chip.iconUrl).toBeDefined();
+  });
+
+  it("should create a smart chip for a PR", () => {
+    const data: GitHubResource = {
+      owner: "octocat",
+      repo: "hello-world",
+      number: 456,
+      title: "Test PR",
+      state: "open",
+      type: GitHubResourceType.PullRequest,
+    };
+
+    const chip = createSmartChip(
+      "https://github.com/octocat/hello-world/pull/456",
+      data,
+    );
+
+    expect(chip.text).toBe("octocat/hello-world PR #456");
+    expect(chip.title).toBe("Test PR");
+    expect(chip.iconUrl).toBeDefined();
+  });
+
+  it("should create a smart chip for a repository", () => {
+    const data: GitHubResource = {
+      owner: "octocat",
+      repo: "hello-world",
+      description: "A test repository",
+      type: GitHubResourceType.Repository,
+    };
+
+    const chip = createSmartChip(
+      "https://github.com/octocat/hello-world",
+      data,
+    );
+
+    expect(chip.text).toBe("octocat/hello-world");
+    expect(chip.title).toBe("A test repository");
+    expect(chip.iconUrl).toBeDefined();
+  });
+});

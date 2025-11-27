@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { hello } from "./hello.js";
-
-hello();
+// Export all public functions for Apps Script
+export { onLinkPreview } from "./addon.js";
+export { authCallback, getAuthorizationUrl, resetAuth } from "./oauth.js";
