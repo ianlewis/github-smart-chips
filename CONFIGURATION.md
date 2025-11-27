@@ -74,16 +74,8 @@ reference during development.
 
 The add-on requests the following OAuth scopes from GitHub:
 
-- `public_repo`: Access to public repositories (allows reading public issues and
-  pull requests)
-
-**Note:** This scope provides read-only access to public repositories. If you
-need to support private repositories, you can change the scope to `repo` in
-`src/oauth.ts`, but note that this grants full control of private repositories.
-
-```typescript
-.setScope("repo")  // For private repositories (full access)
-```
+- `repo`: Full control of private repositories (required to access private
+  issues, pull requests, and repositories)
 
 ## Security Recommendations
 

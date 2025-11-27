@@ -32,7 +32,7 @@ export function getGitHubService(): any {
     .setClientSecret(clientSecret || "")
     .setCallbackFunction("authCallback")
     .setPropertyStore(PropertiesService.getUserProperties())
-    .setScope("public_repo");
+    .setScope("repo");
 }
 
 /**
