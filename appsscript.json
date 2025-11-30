@@ -27,9 +27,7 @@
         "runFunction": "onLinkPreview"
       },
       "universalActions": [],
-      "openLinkUrlPrefixes": [
-        "https://github.com/"
-      ]
+      "openLinkUrlPrefixes": ["https://github.com/"]
     },
     "docs": {
       "linkPreviewTriggers": [

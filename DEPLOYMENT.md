@@ -14,10 +14,10 @@ Script.
 1. Go to <https://github.com/settings/developers>
 2. Click "New OAuth App"
 3. Fill in the application details:
-   - **Application name**: GitHub Smart Chips
-   - **Homepage URL**: Your app's homepage (can be a GitHub repo)
-   - **Authorization callback URL**: The Apps Script callback URL (you'll get
-     this later)
+    - **Application name**: GitHub Smart Chips
+    - **Homepage URL**: Your app's homepage (can be a GitHub repo)
+    - **Authorization callback URL**: The Apps Script callback URL (you'll get
+      this later)
 4. Click "Register application"
 5. Note down the **Client ID**
 6. Generate a new **Client Secret** and save it securely
@@ -86,23 +86,23 @@ clasp push
 1. In Apps Script, go to Project Settings (gear icon)
 2. Scroll to "Script Properties"
 3. Add the following properties:
-   - **GITHUB_CLIENT_ID**: Your GitHub OAuth App Client ID
-   - **GITHUB_CLIENT_SECRET**: Your GitHub OAuth App Client Secret
+    - **GITHUB_CLIENT_ID**: Your GitHub OAuth App Client ID
+    - **GITHUB_CLIENT_SECRET**: Your GitHub OAuth App Client Secret
 
 ## Get Callback URL
 
 1. In your Apps Script project, run the following function once to get the
    callback URL:
 
-   ```javascript
-   function getCallbackUrl() {
-     Logger.log(
-       ScriptApp.getService()
-         .getUrl()
-         .replace("/macros/s/", "/usercallback/")
-     );
-   }
-   ```
+    ```javascript
+    function getCallbackUrl() {
+        Logger.log(
+            ScriptApp.getService()
+                .getUrl()
+                .replace("/macros/s/", "/usercallback/"),
+        );
+    }
+    ```
 
 2. Copy the logged URL
 3. Go back to your GitHub OAuth App settings
