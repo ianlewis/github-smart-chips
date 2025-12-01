@@ -110,7 +110,7 @@ package-lock.json: package.json $(AQUA_ROOT_DIR)/.installed
 		# NOTE: package-lock.json is removed to ensure that npm includes the \
 		# integrity field. npm install will not restore this field if \
 		# missing in an existing package-lock.json file. \
-		rm -f $@; \
+		$(RM) -f $@; \
 		npm --loglevel="$${loglevel}" install \
 			--no-audit \
 			--no-fund; \
@@ -168,11 +168,23 @@ all: test pack ## Build everything.
 
 .PHONY: build
 build: node_modules/.installed ## Build the project.
-	@$(REPO_ROOT)/node_modules/.bin/tsc
+	@# bash \
+	$(RM) -rf $(REPO_ROOT)/lib; \
+	$(REPO_ROOT)/node_modules/.bin/tsc
 
 .PHONY: pack
-pack: node_modules/.installed build ## Create a package tarball.
-	@npm pack
+pack: build ## Builds the distribution.
+	@# bash \
+	$(REPO_ROOT)/node_modules/.bin/rollup \
+		--config rollup.config.ts
+
+.PHONY: deploy
+deploy: pack ## Deploy the project.
+	@# bash \
+	( \
+		cd $(REPO_ROOT)/dist; \
+		$(REPO_ROOT)/node_modules/.bin/clasp push --force; \
+	)
 
 ## Testing
 #####################################################################
@@ -181,7 +193,7 @@ pack: node_modules/.installed build ## Create a package tarball.
 test: lint unit-test ## Run all tests.
 
 .PHONY: unit-test
-unit-test: build ## Runs all unit tests.
+unit-test: node_modules/.installed ## Runs all unit tests.
 	@# bash \
 	# NOTE: Make sure the package builds. \
 	NODE_OPTIONS=--experimental-vm-modules \
@@ -207,7 +219,8 @@ js-format: node_modules/.installed ## Format YAML files.
 			'*.cjs' \
 			'*.mjs' \
 			'*.jsx' \
-			'*.mjsx' \
+ 			'*.mjsx', \
+			':!:dist/' \
 	); \
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
@@ -255,8 +268,9 @@ license-headers: ## Update license headers.
 			'*.py' \
 			'*.rb' \
 			'*.rs' \
-			'*.yaml' \
-			'*.yml' \
+ 			'*.yaml', \
+ 			'*.yml', \
+			':!:dist/' \
 			'Makefile' \
 			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 	); \
@@ -335,7 +349,8 @@ ts-format: node_modules/.installed ## Format YAML files.
 			'*.cts' \
 			'*.mts' \
 			'*.tsx' \
-			'*.mtsx' \
+ 			'*.mtsx', \
+			':!:dist/' \
 	);  \
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
@@ -391,13 +406,10 @@ checkmake: $(AQUA_ROOT_DIR)/.installed ## Runs the checkmake linter.
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		# TODO: Remove newline from the format string after updating checkmake. \
 		checkmake \
-			--config .checkmake.ini \
 			--format '::error file={{.FileName}},line={{.LineNumber}}::{{.Rule}}: {{.Violation}}'$$'\n' \
 			$${files}; \
 	else \
-		checkmake \
-			--config .checkmake.ini \
-			$${files}; \
+		checkmake $${files}; \
 	fi
 
 .PHONY: commitlint
@@ -449,7 +461,8 @@ eslint: node_modules/.installed ## Runs eslint.
 			'*.cts' \
 			'*.mts' \
 			'*.tsx' \
-			'*.mtsx' \
+ 			'*.mtsx', \
+			':!:dist/' \
 			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 	); \
 	if [ "$${files}" == "" ]; then \
@@ -707,4 +720,5 @@ clean: ## Delete temporary files.
 	@$(RM) -r node_modules
 	@$(RM) *.sarif.json
 	@$(RM) -r lib
+	@$(RM) -r dist
 	@$(RM) -r coverage
