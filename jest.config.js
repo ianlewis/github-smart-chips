@@ -20,7 +20,7 @@ export default {
   collectCoverage: true,
   collectCoverageFrom: ["./src/**"],
   coverageDirectory: "./coverage",
-  coveragePathIgnorePatterns: ["/node_modules/", "/lib/"],
+  coveragePathIgnorePatterns: ["/node_modules/", "/lib/", "/dist/"],
   coverageReporters: ["clover", "json", "json-summary", "text", "lcov"],
   extensionsToTreatAsEsm: [".ts"],
   moduleFileExtensions: ["ts", "js"],
@@ -29,9 +29,9 @@ export default {
   resolver: "ts-jest-resolver",
   testEnvironment: "node",
   testMatch: ["**/*.test.ts"],
-  testPathIgnorePatterns: ["/lib/", "/node_modules/"],
+  testPathIgnorePatterns: ["/node_modules/", "/lib/", "/dist/"],
   transform: {
-    "^.+\\.ts$": [
+    "^.+\\.tsx?$": [
       "ts-jest",
       {
         tsconfig: "tsconfig.eslint.json",
