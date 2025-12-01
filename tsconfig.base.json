@@ -21,5 +21,6 @@
     "strict": true,
     "strictNullChecks": true,
     "target": "ES2022"
-  }
+  },
+  "isolatedModules": true
 }
