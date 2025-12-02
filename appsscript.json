@@ -15,6 +15,7 @@
     "https://www.googleapis.com/auth/documents",
     "https://www.googleapis.com/auth/script.external_request"
   ],
+  "urlFetchWhitelist": ["https://api.github.com/"],
   "addOns": {
     "common": {
       "name": "GitHub Smart Chips",
