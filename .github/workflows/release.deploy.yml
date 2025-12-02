@@ -18,12 +18,39 @@ on:
   release:
     types: [created]
   workflow_dispatch:
+  workflow_call:
+    secrets:
+      CLASP_CREDENTIALS:
+        description: "Google Apps Script credentials for clasp"
+        required: true
 
 permissions:
   contents: read
 
+concurrency:
+  group: deploy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    uses: ./.github/workflows/workflow_call.deploy.yml
-    secrets:
-      CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+
+      - name: Set up clasp credentials
+        run: |
+          echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
+          chmod 600 ~/.clasprc.json
+        env:
+          CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
+
+      - name: Deploy to Apps Script
+        run: make deploy
