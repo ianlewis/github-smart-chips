@@ -45,6 +45,8 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+    env:
+      USE_WORKLOAD_IDENTITY: ${{ inputs.workload_identity_provider != '' && inputs.service_account != '' }}
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
@@ -57,7 +59,7 @@ jobs:
 
       # Authenticate with Google Cloud using Workload Identity Federation (preferred)
       - name: Authenticate to Google Cloud
-        if: inputs.workload_identity_provider != '' && inputs.service_account != ''
+        if: env.USE_WORKLOAD_IDENTITY == 'true'
         uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
         with:
           workload_identity_provider: ${{ inputs.workload_identity_provider }}
@@ -65,8 +67,12 @@ jobs:
 
       # Legacy authentication method using OAuth credentials
       - name: Set up clasp credentials (legacy)
-        if: inputs.workload_identity_provider == '' || inputs.service_account == ''
+        if: env.USE_WORKLOAD_IDENTITY != 'true'
         run: |
+          if [ -z "$CLASP_CREDENTIALS" ]; then
+            echo "Error: CLASP_CREDENTIALS secret is not set"
+            exit 1
+          fi
           echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
           chmod 600 ~/.clasprc.json
         env:
@@ -74,11 +80,13 @@ jobs:
 
       - name: Deploy to Apps Script
         run: |
-          if [ -n "${{ inputs.workload_identity_provider }}" ] && [ -n "${{ inputs.service_account }}" ]; then
+          if [ "$USE_WORKLOAD_IDENTITY" = "true" ]; then
             # Use Application Default Credentials with clasp
             make pack
+            # Note: --force is used to overwrite existing deployment without prompts
+            # This is safe in CI/CD as we're deploying from a known release state
             cd dist && ../node_modules/.bin/clasp push --force --adc
           else
-            # Use legacy OAuth credentials
+            # Use legacy OAuth credentials (make deploy includes --force)
             make deploy
           fi
