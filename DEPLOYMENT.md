@@ -79,17 +79,6 @@ clasp push
     - **GITHUB_CLIENT_ID**: Your GitHub OAuth App Client ID
     - **GITHUB_CLIENT_SECRET**: Your GitHub OAuth App Client Secret
 
-## Update Callback URL (if needed)
-
-If you need to update or verify your GitHub OAuth App's callback URL:
-
-1. The callback URL should be in the format:
-   `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
-2. Replace `{SCRIPT_ID}` with your Apps Script project's Script ID (found in
-   Project Settings)
-3. Update the "Authorization callback URL" in your GitHub OAuth App settings if
-   needed
-
 ## Deploy as Add-on
 
 ### Test Deployment
