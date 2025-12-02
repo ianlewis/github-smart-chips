@@ -166,6 +166,43 @@ Google Apps Script when a new release is created.
 
 ### Setup for Automated Deployment
 
+There are two methods for authenticating with Google Apps Script in the CI/CD
+pipeline:
+
+#### Method 1: Workload Identity Federation (Recommended)
+
+This method uses Google Cloud Workload Identity Federation, which is more secure
+as it doesn't require storing long-lived credentials.
+
+1. **Set up Workload Identity Federation**:
+
+    Follow the
+    [Google Cloud documentation](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+    to set up a workload identity pool and provider for GitHub Actions.
+
+2. **Grant permissions to the service account**:
+
+    Ensure the service account has the necessary permissions to deploy to Apps
+    Script.
+
+3. **Configure workflow inputs**:
+
+    When calling the workflow, pass the workload identity provider and service
+    account:
+
+    ```yaml
+    jobs:
+        deploy:
+            uses: ./.github/workflows/release.deploy.yml
+            with:
+                workload_identity_provider: "projects/PROJECT_ID/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID"
+                service_account: "SERVICE_ACCOUNT_EMAIL"
+    ```
+
+#### Method 2: OAuth Credentials (Legacy)
+
+This method uses OAuth credentials stored as a GitHub secret.
+
 1. **Generate clasp credentials**:
 
     ```bash
@@ -184,7 +221,11 @@ Google Apps Script when a new release is created.
     - Value: Copy the entire contents of your `~/.clasprc.json` file
     - Click **Add secret**
 
-3. **Create a release**:
+### Deployment Triggers
+
+The workflow can be triggered in three ways:
+
+1. **Automatically on release creation**:
 
     When you create a new release on GitHub, the deployment workflow will
     automatically:
@@ -192,19 +233,26 @@ Google Apps Script when a new release is created.
     - Package the distribution files
     - Deploy to Google Apps Script using `clasp push`
 
-4. **Manual deployment trigger**:
+2. **Manually via workflow_dispatch**:
 
-    You can also manually trigger the deployment from the Actions tab:
+    You can manually trigger the deployment from the Actions tab:
     - Go to the **Actions** tab in your repository
     - Select the **deploy** workflow
     - Click **Run workflow**
 
+3. **From another workflow via workflow_call**:
+
+    Other workflows can call this workflow to trigger deployment.
+
 ### Security Notes for CI/CD
 
-- The `CLASP_CREDENTIALS` secret contains OAuth tokens - keep it secure
+- **Workload Identity Federation** (recommended): No long-lived credentials
+  stored
+- **OAuth Credentials** (legacy): Keep the `CLASP_CREDENTIALS` secret secure
 - Never commit `.clasprc.json` to the repository
-- Regularly review and rotate credentials if needed
-- The workflow only runs on release events or manual triggers for safety
+- Regularly review and rotate credentials if using the legacy method
+- The workflow requires `id-token: write` permission for Workload Identity
+  Federation
 
 ## Support
 

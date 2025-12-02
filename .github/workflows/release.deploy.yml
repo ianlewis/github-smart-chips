@@ -19,13 +19,23 @@ on:
     types: [created]
   workflow_dispatch:
   workflow_call:
+    inputs:
+      workload_identity_provider:
+        description: "Google Cloud Workload Identity Provider"
+        type: string
+        required: false
+      service_account:
+        description: "Google Cloud Service Account"
+        type: string
+        required: false
     secrets:
       CLASP_CREDENTIALS:
-        description: "Google Apps Script credentials for clasp"
-        required: true
+        description: "Google Apps Script credentials for clasp (legacy method)"
+        required: false
 
 permissions:
   contents: read
+  id-token: write # Required for Workload Identity Federation
 
 concurrency:
   group: deploy-${{ github.event.pull_request.number || github.ref }}
@@ -45,7 +55,17 @@ jobs:
           node-version-file: ".node-version"
           cache: "npm"
 
-      - name: Set up clasp credentials
+      # Authenticate with Google Cloud using Workload Identity Federation (preferred)
+      - name: Authenticate to Google Cloud
+        if: inputs.workload_identity_provider != '' && inputs.service_account != ''
+        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
+        with:
+          workload_identity_provider: ${{ inputs.workload_identity_provider }}
+          service_account: ${{ inputs.service_account }}
+
+      # Legacy authentication method using OAuth credentials
+      - name: Set up clasp credentials (legacy)
+        if: inputs.workload_identity_provider == '' || inputs.service_account == ''
         run: |
           echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
           chmod 600 ~/.clasprc.json
@@ -53,4 +73,12 @@ jobs:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
       - name: Deploy to Apps Script
-        run: make deploy
+        run: |
+          if [ -n "${{ inputs.workload_identity_provider }}" ] && [ -n "${{ inputs.service_account }}" ]; then
+            # Use Application Default Credentials with clasp
+            make pack
+            cd dist && ../node_modules/.bin/clasp push --force --adc
+          else
+            # Use legacy OAuth credentials
+            make deploy
+          fi
