@@ -4,7 +4,7 @@
     "libraries": [
       {
         "userSymbol": "OAuth2",
-        "version": "44",
+        "version": "43",
         "libraryId": "1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF"
       }
     ]
@@ -13,7 +13,8 @@
   "runtimeVersion": "V8",
   "oauthScopes": [
     "https://www.googleapis.com/auth/documents",
-    "https://www.googleapis.com/auth/script.external_request"
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/workspace.linkpreview"
   ],
   "urlFetchWhitelist": ["https://api.github.com/"],
   "addOns": {
