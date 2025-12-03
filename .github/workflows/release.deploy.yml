@@ -31,10 +31,6 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    env:
-      # TODO: Set these to actual values for your Google Cloud project
-      WORKLOAD_IDENTITY_PROVIDER: "projects/PROJECT_ID/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID"
-      SERVICE_ACCOUNT: "SERVICE_ACCOUNT_EMAIL@PROJECT_ID.iam.gserviceaccount.com"
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
@@ -49,8 +45,8 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
         with:
-          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ env.SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.SERVICE_ACCOUNT }}
 
       - name: Deploy to Apps Script
         run: |

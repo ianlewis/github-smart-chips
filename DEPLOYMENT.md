@@ -183,16 +183,21 @@ as it doesn't require storing long-lived credentials.
     Ensure the service account has the necessary permissions to deploy to Apps
     Script.
 
-3. **Update the workflow environment variables**:
+3. **Configure repository variables**:
 
-    Edit `.github/workflows/release.deploy.yml` and replace the placeholder
-    values in the `env` section:
-
-    ```yaml
-    env:
-        WORKLOAD_IDENTITY_PROVIDER: "projects/YOUR_PROJECT_ID/locations/global/workloadIdentityPools/YOUR_POOL_ID/providers/YOUR_PROVIDER_ID"
-        SERVICE_ACCOUNT: "YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com"
-    ```
+    Add the following variables to your GitHub repository:
+    - Go to your GitHub repository settings
+    - Navigate to **Secrets and variables** > **Actions** > **Variables** tab
+    - Click **New repository variable**
+    - Add the following variables:
+        - **Name**: `WORKLOAD_IDENTITY_PROVIDER`
+        - **Value**:
+          `projects/YOUR_PROJECT_ID/locations/global/workloadIdentityPools/YOUR_POOL_ID/providers/YOUR_PROVIDER_ID`
+    - Click **Add variable**
+    - Repeat for the service account:
+        - **Name**: `SERVICE_ACCOUNT`
+        - **Value**:
+          `YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com`
 
 ### Deployment Triggers
 
