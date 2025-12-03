@@ -9,19 +9,6 @@ Script.
 2. A GitHub OAuth App (for authentication)
 3. Node.js and npm installed locally
 
-## Setup GitHub OAuth App
-
-1. Go to <https://github.com/settings/developers>
-2. Click "New OAuth App"
-3. Fill in the application details:
-    - **Application name**: GitHub Smart Chips
-    - **Homepage URL**: Your app's homepage (can be a GitHub repo)
-    - **Authorization callback URL**: The Apps Script callback URL (you'll get
-      this later)
-4. Click "Register application"
-5. Note down the **Client ID**
-6. Generate a new **Client Secret** and save it securely
-
 ## Build the Project
 
 ```bash
@@ -41,20 +28,23 @@ This will generate JavaScript files in the `lib/` directory.
 1. Go to <https://script.google.com/>
 2. Click "New Project"
 3. Give your project a name (e.g., "GitHub Smart Chips")
+4. Note the **Script ID** from the project settings (gear icon) - you'll need
+   this for the GitHub OAuth App callback URL
 
-## Add OAuth2 Library
+## Setup GitHub OAuth App
 
-The OAuth2 library is required for GitHub authentication.
-
-1. In your Apps Script project, click the "+" next to Libraries
-2. Enter the Script ID: `1B7FSrk5Zi6L1rSxxTDgDEUsPzlukDsi4KGuTMorsTQHhGBzBkMun4iDF`
-3. Click "Look up"
-4. Select the latest version (version 44 or higher)
-5. Click "Add"
-
-**Note:** Verify the library ID and version in the [official OAuth2 for Apps
-Script
-repository](https://github.com/googleworkspace/apps-script-oauth2#readme).
+1. Go to <https://github.com/settings/developers>
+2. Click "New OAuth App"
+3. Fill in the application details:
+    - **Application name**: GitHub Smart Chips
+    - **Homepage URL**: Your app's homepage (can be a GitHub repo)
+    - **Authorization callback URL**:
+      `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback` (replace
+      `{SCRIPT_ID}` with your Apps Script project's Script ID from the previous
+      step)
+4. Click "Register application"
+5. Note down the **Client ID**
+6. Generate a new **Client Secret** and save it securely
 
 ## Upload Files
 
@@ -89,25 +79,6 @@ clasp push
     - **GITHUB_CLIENT_ID**: Your GitHub OAuth App Client ID
     - **GITHUB_CLIENT_SECRET**: Your GitHub OAuth App Client Secret
 
-## Get Callback URL
-
-1. In your Apps Script project, run the following function once to get the
-   callback URL:
-
-    ```javascript
-    function getCallbackUrl() {
-        Logger.log(
-            ScriptApp.getService()
-                .getUrl()
-                .replace("/macros/s/", "/usercallback/"),
-        );
-    }
-    ```
-
-2. Copy the logged URL
-3. Go back to your GitHub OAuth App settings
-4. Update the "Authorization callback URL" with the URL you just copied
-
 ## Deploy as Add-on
 
 ### Test Deployment
@@ -137,8 +108,9 @@ clasp push
 ### Authentication Issues
 
 - Ensure the GitHub OAuth App callback URL matches the Apps Script callback URL
+  format: `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
 - Check that script properties are set correctly
-- Make sure the OAuth2 library is added and the correct version is selected
+- Verify that the OAuth2 library is properly configured in `appsscript.json`
 
 ### Smart Chips Not Appearing
 
