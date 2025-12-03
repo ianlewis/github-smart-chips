@@ -162,14 +162,12 @@ clasp push
 ## Automated Deployment via GitHub Actions
 
 The project includes a GitHub Actions workflow that automatically deploys to
-Google Apps Script when a new release is created.
+Google Apps Script when a new release is created using Google Cloud Workload
+Identity Federation for secure, keyless authentication.
 
 ### Setup for Automated Deployment
 
-There are two methods for authenticating with Google Apps Script in the CI/CD
-pipeline:
-
-#### Method 1: Workload Identity Federation (Recommended)
+#### Configure Workload Identity Federation
 
 This method uses Google Cloud Workload Identity Federation, which is more secure
 as it doesn't require storing long-lived credentials.
@@ -185,53 +183,29 @@ as it doesn't require storing long-lived credentials.
     Ensure the service account has the necessary permissions to deploy to Apps
     Script.
 
-3. **Configure workflow inputs**:
+3. **Update the workflow environment variables**:
 
-    When calling the workflow, pass the workload identity provider and service
-    account:
+    Edit `.github/workflows/release.deploy.yml` and replace the placeholder
+    values in the `env` section:
 
     ```yaml
-    jobs:
-        deploy:
-            uses: ./.github/workflows/release.deploy.yml
-            with:
-                workload_identity_provider: "projects/PROJECT_ID/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID"
-                service_account: "SERVICE_ACCOUNT_EMAIL"
+    env:
+        WORKLOAD_IDENTITY_PROVIDER: "projects/YOUR_PROJECT_ID/locations/global/workloadIdentityPools/YOUR_POOL_ID/providers/YOUR_PROVIDER_ID"
+        SERVICE_ACCOUNT: "YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com"
     ```
-
-#### Method 2: OAuth Credentials (Legacy)
-
-This method uses OAuth credentials stored as a GitHub secret.
-
-1. **Generate clasp credentials**:
-
-    ```bash
-    # Login to Google
-    clasp login
-    ```
-
-    This creates a `.clasprc.json` file in your home directory containing OAuth
-    credentials.
-
-2. **Add credentials to GitHub Secrets**:
-    - Go to your GitHub repository settings
-    - Navigate to **Secrets and variables** > **Actions**
-    - Click **New repository secret**
-    - Name: `CLASP_CREDENTIALS`
-    - Value: Copy the entire contents of your `~/.clasprc.json` file
-    - Click **Add secret**
 
 ### Deployment Triggers
 
-The workflow can be triggered in three ways:
+The workflow can be triggered in two ways:
 
 1. **Automatically on release creation**:
 
     When you create a new release on GitHub, the deployment workflow will
     automatically:
+    - Authenticate using Workload Identity Federation
     - Build the TypeScript code
     - Package the distribution files
-    - Deploy to Google Apps Script using `clasp push`
+    - Deploy to Google Apps Script using `clasp push --adc`
 
 2. **Manually via workflow_dispatch**:
 
@@ -240,19 +214,12 @@ The workflow can be triggered in three ways:
     - Select the **deploy** workflow
     - Click **Run workflow**
 
-3. **From another workflow via workflow_call**:
-
-    Other workflows can call this workflow to trigger deployment.
-
 ### Security Notes for CI/CD
 
-- **Workload Identity Federation** (recommended): No long-lived credentials
-  stored
-- **OAuth Credentials** (legacy): Keep the `CLASP_CREDENTIALS` secret secure
-- Never commit `.clasprc.json` to the repository
-- Regularly review and rotate credentials if using the legacy method
-- The workflow requires `id-token: write` permission for Workload Identity
-  Federation
+- Uses **Workload Identity Federation**: No long-lived credentials stored
+- Requires `id-token: write` permission for Workload Identity Federation
+- Never commit `.clasprc.json` or service account keys to the repository
+- The workflow only runs on release events or manual triggers for safety
 
 ## Support
 

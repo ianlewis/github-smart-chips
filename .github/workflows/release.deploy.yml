@@ -18,20 +18,6 @@ on:
   release:
     types: [created]
   workflow_dispatch:
-  workflow_call:
-    inputs:
-      workload_identity_provider:
-        description: "Google Cloud Workload Identity Provider"
-        type: string
-        required: false
-      service_account:
-        description: "Google Cloud Service Account"
-        type: string
-        required: false
-    secrets:
-      CLASP_CREDENTIALS:
-        description: "Google Apps Script credentials for clasp (legacy method)"
-        required: false
 
 permissions:
   contents: read
@@ -46,7 +32,9 @@ jobs:
     name: deploy
     runs-on: ubuntu-latest
     env:
-      USE_WORKLOAD_IDENTITY: ${{ inputs.workload_identity_provider != '' && inputs.service_account != '' }}
+      # TODO: Set these to actual values for your Google Cloud project
+      WORKLOAD_IDENTITY_PROVIDER: "projects/PROJECT_ID/locations/global/workloadIdentityPools/POOL_ID/providers/PROVIDER_ID"
+      SERVICE_ACCOUNT: "SERVICE_ACCOUNT_EMAIL@PROJECT_ID.iam.gserviceaccount.com"
     steps:
       - uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
@@ -57,36 +45,17 @@ jobs:
           node-version-file: ".node-version"
           cache: "npm"
 
-      # Authenticate with Google Cloud using Workload Identity Federation (preferred)
+      # Authenticate with Google Cloud using Workload Identity Federation
       - name: Authenticate to Google Cloud
-        if: env.USE_WORKLOAD_IDENTITY == 'true'
         uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
         with:
-          workload_identity_provider: ${{ inputs.workload_identity_provider }}
-          service_account: ${{ inputs.service_account }}
-
-      # Legacy authentication method using OAuth credentials
-      - name: Set up clasp credentials (legacy)
-        if: env.USE_WORKLOAD_IDENTITY != 'true'
-        run: |
-          if [ -z "$CLASP_CREDENTIALS" ]; then
-            echo "Error: CLASP_CREDENTIALS secret is not set"
-            exit 1
-          fi
-          echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
-          chmod 600 ~/.clasprc.json
-        env:
-          CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
+          workload_identity_provider: ${{ env.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ env.SERVICE_ACCOUNT }}
 
       - name: Deploy to Apps Script
         run: |
-          if [ "$USE_WORKLOAD_IDENTITY" = "true" ]; then
-            # Use Application Default Credentials with clasp
-            make pack
-            # Note: --force is used to overwrite existing deployment without prompts
-            # This is safe in CI/CD as we're deploying from a known release state
-            cd dist && ../node_modules/.bin/clasp push --force --adc
-          else
-            # Use legacy OAuth credentials (make deploy includes --force)
-            make deploy
-          fi
+          # Use Application Default Credentials with clasp
+          make pack
+          # Note: --force is used to overwrite existing deployment without prompts
+          # This is safe in CI/CD as we're deploying from a known release state
+          cd dist && ../node_modules/.bin/clasp push --force --adc
