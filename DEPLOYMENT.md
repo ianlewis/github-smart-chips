@@ -204,7 +204,7 @@ The workflow can be triggered in two ways:
     - Package the distribution files
     - Deploy to Google Apps Script using `make deploy`
 
-2. **Manually via workflow_dispatch**:
+2. **Manually via `workflow_dispatch`**:
 
     You can manually trigger the deployment from the Actions tab:
     - Go to the **Actions** tab in your repository
