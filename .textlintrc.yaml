@@ -22,6 +22,9 @@ rules:
     language: "en"
     skipPatterns:
       # Terminology
+      - "/\\bCommonJS\\b/" # JavaScript module system
+      - "/\\bRollup\\.js\\b/" # JavaScript module bundler
+
       - "/\\bCodecov\\b/" # Code coverage service
       - "/\\bESM\\b/" # ECMAScript Modules
 
