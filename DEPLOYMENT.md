@@ -131,6 +131,65 @@ clasp push
 - Regularly rotate your GitHub OAuth App credentials
 - Monitor the add-on's API usage
 
+## Automated Deployment via GitHub Actions
+
+The project includes a GitHub Actions workflow that automatically deploys to
+Google Apps Script when a new release is created.
+
+### Setup for Automated Deployment
+
+The deployment workflow uses clasp credentials stored as a GitHub secret.
+
+**Note:** Google Apps Script API does not support service accounts, so Workload
+Identity Federation cannot be used for deployment. See
+[google/clasp#1051](https://github.com/google/clasp/issues/1051) and
+[Issue 442055772](https://issuetracker.google.com/issues/442055772) for more
+details.
+
+1. **Generate clasp credentials**:
+
+    ```bash
+    # Login to Google
+    clasp login
+    ```
+
+    This creates a `.clasprc.json` file in your home directory containing OAuth
+    credentials.
+
+2. **Add credentials to GitHub Secrets**:
+    - Go to your GitHub repository settings
+    - Navigate to **Secrets and variables** > **Actions** > **Secrets** tab
+    - Click **New repository secret**
+    - Name: `CLASP_CREDENTIALS`
+    - Value: Copy the entire contents of your `~/.clasprc.json` file
+    - Click **Add secret**
+
+### Deployment Triggers
+
+The workflow can be triggered in two ways:
+
+1. **Automatically on release creation**:
+
+    When you create a new release on GitHub, the deployment workflow will
+    automatically:
+    - Build the TypeScript code
+    - Package the distribution files
+    - Deploy to Google Apps Script using `make deploy`
+
+2. **Manually via `workflow_dispatch`**:
+
+    You can manually trigger the deployment from the Actions tab:
+    - Go to the **Actions** tab in your repository
+    - Select the **deploy** workflow
+    - Click **Run workflow**
+
+### Security Notes for CI/CD
+
+- The `CLASP_CREDENTIALS` secret contains OAuth tokens - keep it secure
+- Never commit `.clasprc.json` to the repository
+- Regularly review and rotate credentials if needed
+- The workflow only runs on release events or manual triggers for safety
+
 ## Support
 
 For issues and questions, please open an issue on the GitHub repository.
