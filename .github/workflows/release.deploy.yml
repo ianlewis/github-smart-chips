@@ -42,10 +42,20 @@ jobs:
 
       - name: Set up clasp credentials
         run: |
+          if [ -z "$CLASP_CREDENTIALS" ]; then
+            echo "Error: CLASP_CREDENTIALS secret is not set"
+            exit 1
+          fi
           echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
           chmod 600 ~/.clasprc.json
         env:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
       - name: Deploy to Apps Script
-        run: make deploy
+        run: |
+          # Build TypeScript, package distribution, and deploy to Apps Script
+          make deploy
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f ~/.clasprc.json
