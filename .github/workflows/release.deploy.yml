@@ -21,7 +21,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write # Required for Workload Identity Federation
 
 concurrency:
   group: deploy-${{ github.event.pull_request.number || github.ref }}
@@ -41,17 +40,12 @@ jobs:
           node-version-file: ".node-version"
           cache: "npm"
 
-      # Authenticate with Google Cloud using Workload Identity Federation
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2.1.7
-        with:
-          workload_identity_provider: ${{ vars.WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.SERVICE_ACCOUNT }}
+      - name: Set up clasp credentials
+        run: |
+          echo "$CLASP_CREDENTIALS" > ~/.clasprc.json
+          chmod 600 ~/.clasprc.json
+        env:
+          CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
       - name: Deploy to Apps Script
-        run: |
-          # Use Application Default Credentials with clasp
-          make pack
-          # Note: --force is used to overwrite existing deployment without prompts
-          # This is safe in CI/CD as we're deploying from a known release state
-          cd dist && ../node_modules/.bin/clasp push --force --adc
+        run: make deploy
