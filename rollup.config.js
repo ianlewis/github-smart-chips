@@ -27,29 +27,43 @@ function stripExportsForAppsScript() {
     renderChunk(code) {
       let modifiedCode = code;
 
-      // Remove the opening IIFE wrapper: (function (exports) {
-      modifiedCode = modifiedCode.replace(/^\(function \(exports\) \{\s*\n/, "");
+      // Remove the opening IIFE wrapper: (function (exports) { with flexible whitespace
+      modifiedCode = modifiedCode.replace(/^\s*\(\s*function\s*\(\s*exports\s*\)\s*\{\s*\n?/, "");
 
       // Remove 'use strict' as it's not needed for Apps Script
-      modifiedCode = modifiedCode.replace(/\s*'use strict';\s*\n/, "");
+      modifiedCode = modifiedCode.replace(/\s*['"]use strict['"];\s*\n?/, "");
 
-      // Remove all exports.xxx = xxx; statements
-      modifiedCode = modifiedCode.replace(/\s*exports\.\w+\s*=\s*\w+;\s*/g, "");
+      // Remove all exports.xxx = xxx; statements with flexible matching
+      // This handles various cases like exports.foo = bar, exports.foo = bar.baz, etc.
+      modifiedCode = modifiedCode.replace(/\s*exports\.\w+\s*=\s*[^;]+;\s*/g, "");
 
-      // Remove the closing IIFE wrapper: return exports; })({});
-      modifiedCode = modifiedCode.replace(
-        /\s*return exports;\s*\}\)\(\{\}\);?\s*$/,
-        "",
-      );
+      // Remove the closing IIFE wrapper with flexible whitespace and optional semicolons
+      modifiedCode = modifiedCode.replace(/\s*return\s+exports;\s*\}\s*\)\s*\(\s*\{\s*\}\s*\)\s*;?\s*$/, "");
 
-      // Remove the 4-space indentation that was added by the IIFE wrapper
-      modifiedCode = modifiedCode
-        .split("\n")
-        .map((line) => {
-          // Remove up to 4 spaces of indentation from each line
-          return line.replace(/^    /, "");
-        })
-        .join("\n");
+      // Remove the indentation that was added by the IIFE wrapper
+      // Detect the common indentation by looking at the first non-empty line
+      const lines = modifiedCode.split("\n");
+      let commonIndent = null;
+      
+      for (const line of lines) {
+        if (line.trim().length > 0) {
+          const match = line.match(/^(\s+)/);
+          if (match) {
+            commonIndent = match[1];
+            break;
+          }
+        }
+      }
+      
+      // Remove the common indentation from all lines
+      if (commonIndent) {
+        modifiedCode = lines.map((line) => {
+          if (line.startsWith(commonIndent)) {
+            return line.substring(commonIndent.length);
+          }
+          return line;
+        }).join("\n");
+      }
 
       return {
         code: modifiedCode,
