@@ -15,12 +15,14 @@
     "@typescript-eslint/eslint-plugin": "8.48.0",
     "@typescript-eslint/parser": "8.48.0",
     "dictionary-en": "4.0.0",
+    "encoding": "0.1.13",
     "eslint": "9.39.1",
     "eslint-import-resolver-typescript": "4.4.4",
     "eslint-plugin-github": "6.0.0",
     "eslint-plugin-prettier": "5.5.4",
     "jest": "30.2.0",
     "markdownlint-cli": "0.46.0",
+    "picomatch": "4.0.3",
     "prettier": "3.7.1",
     "renovate": "42.26.5",
     "rollup": "4.53.3",
@@ -31,8 +33,6 @@
     "textlint-rule-spelling": "0.3.0",
     "ts-jest": "29.4.4",
     "ts-jest-resolver": "2.0.1",
-    "typescript": "5.9.3",
-    "encoding": "0.1.13",
-    "picomatch": "4.0.3"
+    "typescript": "5.9.3"
   }
 }

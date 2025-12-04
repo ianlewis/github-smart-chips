@@ -176,7 +176,7 @@ build: node_modules/.installed ## Build the project.
 pack: build ## Builds the distribution.
 	@# bash \
 	$(REPO_ROOT)/node_modules/.bin/rollup \
-		--config rollup.config.ts
+		--config rollup.config.js
 
 .PHONY: deploy
 deploy: pack ## Deploy the project.
