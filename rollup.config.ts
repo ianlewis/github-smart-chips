@@ -18,14 +18,16 @@ import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import copy from "rollup-plugin-copy";
 import del from "rollup-plugin-delete";
+import gas from "rollup-plugin-google-apps-script";
+import filesize from "rollup-plugin-filesize";
+import swcPlugin from "@rollup/plugin-swc";
 
 const config = {
   input: "lib/index.js",
   output: {
-    name: "global",
     esModule: false,
     file: "dist/index.js",
-    format: "cjs",
+    format: "iife",
     sourcemap: false,
   },
   plugins: [
@@ -38,6 +40,14 @@ const config = {
         { src: ".clasp.json", dest: "dist/" },
       ],
     }),
+    swcPlugin(),
+    gas({
+      gasEntryOptions: {
+        comment: false,
+      },
+      moduleHeaderComment: true,
+    }),
+    filesize(),
   ],
 };
 
