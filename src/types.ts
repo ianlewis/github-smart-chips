@@ -13,27 +13,58 @@
 // limitations under the License.
 
 /**
- * GitHub resource type
+ * GitHub user data
  */
-export enum GitHubResourceType {
-  // eslint-disable-next-line no-unused-vars
-  Issue = "issue",
-  // eslint-disable-next-line no-unused-vars
-  PullRequest = "pull_request",
-  // eslint-disable-next-line no-unused-vars
-  Repository = "repository",
+export interface GitHubUser {
+  login: string;
+  avatar_url: string;
+  html_url: string;
 }
 
 /**
- * GitHub issue or pull request data
+ * GitHub label data
  */
-export interface GitHubIssueOrPR {
+export interface GitHubLabel {
+  name: string;
+  color: string;
+  description?: string;
+}
+
+/**
+ * GitHub issue data
+ */
+export interface GitHubIssue {
   owner: string;
   repo: string;
   number: number;
   title: string;
   state: string;
-  type: GitHubResourceType.Issue | GitHubResourceType.PullRequest;
+  body?: string;
+  created_at: string;
+  user: GitHubUser;
+  labels: GitHubLabel[];
+}
+
+/**
+ * GitHub pull request data
+ */
+export interface GitHubPullRequest {
+  owner: string;
+  repo: string;
+  number: number;
+  title: string;
+  state: string;
+  body?: string;
+  created_at: string;
+  user: GitHubUser;
+  labels: GitHubLabel[];
+  merged?: boolean;
+  base?: {
+    ref: string;
+  };
+  head?: {
+    ref: string;
+  };
 }
 
 /**
@@ -42,14 +73,14 @@ export interface GitHubIssueOrPR {
 export interface GitHubRepository {
   owner: string;
   repo: string;
-  description: string;
-  type: GitHubResourceType.Repository;
+  description?: string;
+  private: boolean;
+  language?: string;
+  stargazers_count: number;
+  forks_count: number;
+  updated_at: string;
+  html_url: string;
 }
-
-/**
- * Union type for all GitHub resources
- */
-export type GitHubResource = GitHubIssueOrPR | GitHubRepository;
 
 /**
  * Parsed GitHub URL information
@@ -58,5 +89,5 @@ export interface GitHubURLInfo {
   owner: string;
   repo: string;
   number?: number;
-  type: GitHubResourceType;
+  type: "repository" | "issue" | "pull_request";
 }

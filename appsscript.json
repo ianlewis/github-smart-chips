@@ -16,7 +16,10 @@
     "https://www.googleapis.com/auth/script.external_request",
     "https://www.googleapis.com/auth/workspace.linkpreview"
   ],
-  "urlFetchWhitelist": ["https://api.github.com/"],
+  "urlFetchWhitelist": [
+    "https://api.github.com/",
+    "https://github.com/login/oauth/access_token"
+  ],
   "addOns": {
     "common": {
       "name": "GitHub Smart Chips",
@@ -37,16 +40,31 @@
           "runFunction": "onLinkPreview",
           "patterns": [
             {
-              "hostPattern": "github.com",
-              "pathPrefix": "*/*/issues/*"
-            },
+              "hostPattern": "github.com"
+            }
+          ]
+        }
+      ]
+    },
+    "sheets": {
+      "linkPreviewTriggers": [
+        {
+          "runFunction": "onLinkPreview",
+          "patterns": [
             {
-              "hostPattern": "github.com",
-              "pathPrefix": "*/*/pull/*"
-            },
+              "hostPattern": "github.com"
+            }
+          ]
+        }
+      ]
+    },
+    "slides": {
+      "linkPreviewTriggers": [
+        {
+          "runFunction": "onLinkPreview",
+          "patterns": [
             {
-              "hostPattern": "github.com",
-              "pathPrefix": "*/*"
+              "hostPattern": "github.com"
             }
           ]
         }
