@@ -59,6 +59,26 @@ describe("parseGitHubURL", () => {
     expect(result?.type).toBe("repository");
   });
 
+  it("should parse GitHub repository URLs with additional tree segments", () => {
+    const url = "https://github.com/owner/repo/tree/main/src";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
+    expect(result?.type).toBe("repository");
+  });
+
+  it("should parse GitHub repository URLs with additional blob segments", () => {
+    const url = "https://github.com/owner/repo/blob/main/src/index.js";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
+    expect(result?.type).toBe("repository");
+  });
+
   it("should return null for non-GitHub URLs", () => {
     const url = "https://example.com/some/path";
     const result = parseGitHubURL(url);
@@ -66,7 +86,7 @@ describe("parseGitHubURL", () => {
     expect(result).toBeNull();
   });
 
-  it("should handle URLs with additional path segments", () => {
+  it("should handle issue URLs with additional path segments", () => {
     const url = "https://github.com/owner/repo/issues/123#issuecomment-456";
     const result = parseGitHubURL(url);
 
@@ -77,11 +97,24 @@ describe("parseGitHubURL", () => {
     expect(result?.type).toBe("issue");
   });
 
+  it("should handle PR URLs with additional path segments", () => {
+    const url = "https://github.com/owner/repo/pull/123#discussion_r2596325999";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
+    expect(result?.number).toBe(123);
+    expect(result?.type).toBe("pull_request");
+  });
+
   it("should prioritize issue URLs over repository URLs", () => {
     const url = "https://github.com/owner/repo/issues/789";
     const result = parseGitHubURL(url);
 
     expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
     expect(result?.type).toBe("issue");
     expect(result?.number).toBe(789);
   });
@@ -91,6 +124,8 @@ describe("parseGitHubURL", () => {
     const result = parseGitHubURL(url);
 
     expect(result).not.toBeNull();
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
     expect(result?.type).toBe("pull_request");
     expect(result?.number).toBe(101);
   });

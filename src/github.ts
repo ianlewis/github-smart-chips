@@ -25,7 +25,8 @@ import {
 export function parseGitHubURL(url: string): GitHubURLInfo | null {
   const issuePattern = /github\.com\/([^/]+)\/([^/]+)\/issues\/(\d+)/;
   const pullPattern = /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
-  const repoPattern = /github\.com\/([^/]+)\/([^/]+?)\/?$/;
+  const repoPattern =
+    /github\.com\/([^/]+)\/([^/]+)(\/(tree|blob)\/([^/]+)\/?|\/?$)/;
 
   let match = url.match(pullPattern);
   if (match) {
