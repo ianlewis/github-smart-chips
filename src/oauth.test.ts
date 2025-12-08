@@ -65,11 +65,11 @@ beforeEach(() => {
 
   // Mock global objects
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).PropertiesService = mockPropertiesService;
+  (globalThis as any).PropertiesService = mockPropertiesService;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).OAuth2 = mockOAuth2Lib;
+  (globalThis as any).OAuth2 = mockOAuth2Lib;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).HtmlService = mockHtmlService;
+  (globalThis as any).HtmlService = mockHtmlService;
 
   mockPropertiesService.getScriptProperties.mockReturnValue(mockScriptProps);
   mockPropertiesService.getUserProperties.mockReturnValue(mockUserProps);

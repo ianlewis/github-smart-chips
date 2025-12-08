@@ -63,7 +63,7 @@ const mockOpenLink = {
 
 beforeEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).CardService = {
+  (globalThis as any).CardService = {
     newCardBuilder: jest.fn(() => mockCardBuilder),
     newCardHeader: jest.fn(() => mockCardHeader),
     newCardSection: jest.fn(() => mockCardSection),

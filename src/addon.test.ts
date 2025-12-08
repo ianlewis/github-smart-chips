@@ -88,7 +88,7 @@ const mockOpenLink = {
 
 beforeEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).CardService = {
+  (globalThis as any).CardService = {
     newCardBuilder: jest.fn(() => mockCardBuilder),
     newCardHeader: jest.fn(() => mockCardHeader),
     newCardSection: jest.fn(() => mockCardSection),
@@ -105,13 +105,13 @@ beforeEach(() => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).ScriptApp = {
+  (globalThis as any).ScriptApp = {
     getScriptId: jest.fn(() => "test-script-id"),
   };
 
   // Mock PropertiesService for OAuth calls
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).PropertiesService = {
+  (globalThis as any).PropertiesService = {
     getScriptProperties: jest.fn(() => ({
       getProperty: jest.fn(() => "test-value"),
     })),
@@ -120,7 +120,7 @@ beforeEach(() => {
 
   // Mock OAuth2
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).OAuth2 = {
+  (globalThis as any).OAuth2 = {
     createService: jest.fn(() => ({
       setAuthorizationBaseUrl: jest.fn().mockReturnThis(),
       setTokenUrl: jest.fn().mockReturnThis(),
@@ -137,13 +137,13 @@ beforeEach(() => {
 
   // Mock HtmlService
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).HtmlService = {
+  (globalThis as any).HtmlService = {
     createHtmlOutput: jest.fn(() => ({})),
   };
 
   // Mock UrlFetchApp for GitHub API calls
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (global as any).UrlFetchApp = {
+  (globalThis as any).UrlFetchApp = {
     fetch: jest.fn(() => ({
       getResponseCode: () => 200,
       getContentText: () => JSON.stringify({ test: "data" }),
