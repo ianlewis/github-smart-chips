@@ -17,13 +17,13 @@ import {
   createIssueCard,
   createPullRequestCard,
   createRepositoryCard,
-  GITHUB_LOGO,
 } from "./ui.js";
 import {
   type GitHubRepository,
   type GitHubIssue,
   type GitHubPullRequest,
 } from "./types.js";
+import { GITHUB_LOGO } from "./logos.js";
 
 // Mock CardService
 const mockCardBuilder = {

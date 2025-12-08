@@ -18,13 +18,13 @@ import {
   createRepositoryCard,
   createIssueCard,
   createPullRequestCard,
-  GITHUB_LOGO,
 } from "./ui.js";
 import {
   type GitHubRepository,
   type GitHubIssue,
   type GitHubPullRequest,
 } from "./types.js";
+import { GITHUB_LOGO } from "./logos.js";
 
 /**
  * Handle link preview requests for GitHub URLs
