@@ -199,7 +199,7 @@ describe("onLinkPreview", () => {
       expect((result as any[])[0].id).toBe("mock-card");
     });
 
-    it("should extract URL from sheets event when docs URL is not available", () => {
+    it("should extract URL from sheets event", () => {
       mockClient.fetchRepository.mockReturnValue({
         owner: "owner",
         repo: "repo",
@@ -237,7 +237,7 @@ describe("onLinkPreview", () => {
       expect((result as any[])[0].id).toBe("mock-card");
     });
 
-    it("should extract URL from slides event when docs and sheets URLs are not available", () => {
+    it("should extract URL from slides event", () => {
       mockClient.fetchRepository.mockReturnValue({
         owner: "owner",
         repo: "repo",
