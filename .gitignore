@@ -106,6 +106,9 @@ typings/
 .DS_Store
 Thumbs.db
 
+# Claude local settings.
+.claude
+
 # Ignore built ts files
 __tests__/runner/*
 lib/

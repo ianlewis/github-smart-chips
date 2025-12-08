@@ -64,8 +64,17 @@ built-in TypeScript and compiled to JavaScript for Google Apps Script.
 
 ## Supported GitHub URLs
 
-- `https://github.com/{owner}/{repo}/issues/{number}`
-- `https://github.com/{owner}/{repo}/pull/{number}`
+- `https://github.com/{owner}/{repo}` - Repository links
+- `https://github.com/{owner}/{repo}/issues/{number}` - Issue links
+- `https://github.com/{owner}/{repo}/pull/{number}` - Pull Request links
+
+## Supported Google Workspace Apps
+
+The add-on works in:
+
+- Google Docs
+- Google Sheets
+- Google Slides
 
 ## Development Notes
 

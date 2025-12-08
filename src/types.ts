@@ -13,43 +13,74 @@
 // limitations under the License.
 
 /**
- * GitHub resource type
+ * GitHub user data
  */
-export enum GitHubResourceType {
-  // eslint-disable-next-line no-unused-vars
-  Issue = "issue",
-  // eslint-disable-next-line no-unused-vars
-  PullRequest = "pull_request",
-  // eslint-disable-next-line no-unused-vars
-  Repository = "repository",
+export interface GitHubUser {
+  login: string;
+  avatar_url: string;
+  html_url: string;
 }
 
 /**
- * GitHub issue or pull request data
+ * GitHub label data
  */
-export interface GitHubIssueOrPR {
-  owner: string;
-  repo: string;
+export interface GitHubLabel {
+  name: string;
+  color: string;
+  description?: string;
+}
+
+/**
+ * GitHub issue data
+ */
+export interface GitHubIssue {
   number: number;
   title: string;
   state: string;
-  type: GitHubResourceType.Issue | GitHubResourceType.PullRequest;
+  body?: string;
+  created_at: string;
+  user: GitHubUser;
+  repo: GitHubRepository;
+  labels: GitHubLabel[];
+}
+
+/**
+ * GitHub pull request data
+ */
+export interface GitHubPullRequest {
+  number: number;
+  title: string;
+  state: string;
+  body?: string;
+  created_at: string;
+  user: GitHubUser;
+  labels: GitHubLabel[];
+  merged?: boolean;
+  base: {
+    ref: string;
+    repo: GitHubRepository;
+  };
+  head: {
+    ref: string;
+    repo: GitHubRepository;
+  };
 }
 
 /**
  * GitHub repository data
  */
 export interface GitHubRepository {
-  owner: string;
-  repo: string;
-  description: string;
-  type: GitHubResourceType.Repository;
+  owner: GitHubUser;
+  name: string;
+  full_name: string;
+  description?: string;
+  private: boolean;
+  language?: string;
+  stargazers_count: number;
+  forks_count: number;
+  updated_at: string;
+  html_url: string;
 }
-
-/**
- * Union type for all GitHub resources
- */
-export type GitHubResource = GitHubIssueOrPR | GitHubRepository;
 
 /**
  * Parsed GitHub URL information
@@ -58,5 +89,5 @@ export interface GitHubURLInfo {
   owner: string;
   repo: string;
   number?: number;
-  type: GitHubResourceType;
+  type: "repository" | "issue" | "pull_request";
 }

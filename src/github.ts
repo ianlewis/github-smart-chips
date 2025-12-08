@@ -13,8 +13,9 @@
 // limitations under the License.
 
 import {
-  GitHubResourceType,
-  type GitHubResource,
+  type GitHubRepository,
+  type GitHubIssue,
+  type GitHubPullRequest,
   type GitHubURLInfo,
 } from "./types.js";
 
@@ -24,7 +25,8 @@ import {
 export function parseGitHubURL(url: string): GitHubURLInfo | null {
   const issuePattern = /github\.com\/([^/]+)\/([^/]+)\/issues\/(\d+)/;
   const pullPattern = /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
-  const repoPattern = /github\.com\/([^/]+)\/([^/]+?)(?:\/|$|\?|#)/;
+  const repoPattern =
+    /github\.com\/([^/]+)\/([^/]+)(\/(tree|blob)\/([^/]+)\/?|\/?$)/;
 
   let match = url.match(pullPattern);
   if (match) {
@@ -32,7 +34,7 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
       owner: match[1],
       repo: match[2],
       number: parseInt(match[3], 10),
-      type: GitHubResourceType.PullRequest,
+      type: "pull_request",
     };
   }
 
@@ -42,7 +44,7 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
       owner: match[1],
       repo: match[2],
       number: parseInt(match[3], 10),
-      type: GitHubResourceType.Issue,
+      type: "issue",
     };
   }
 
@@ -51,7 +53,7 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
     return {
       owner: match[1],
       repo: match[2],
-      type: GitHubResourceType.Repository,
+      type: "repository",
     };
   }
 
@@ -59,105 +61,112 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
 }
 
 /**
- * Fetch GitHub resource data using the GitHub API
+ * GitHub API Client class for fetching GitHub data
  */
-export function fetchGitHubData(
-  urlInfo: GitHubURLInfo,
-  accessToken: string,
-): GitHubResource | null {
-  if (urlInfo.type === GitHubResourceType.Repository) {
-    return fetchRepositoryData(urlInfo, accessToken);
-  } else {
-    return fetchIssueOrPRData(urlInfo, accessToken);
-  }
-}
+export class GitHubAPIClient {
+  private accessToken: string;
 
-/**
- * Fetch GitHub issue or PR data using the GitHub API
- */
-function fetchIssueOrPRData(
-  urlInfo: GitHubURLInfo,
-  accessToken: string,
-): GitHubResource | null {
-  if (!urlInfo.number) {
-    return null;
+  constructor(accessToken: string) {
+    this.accessToken = accessToken;
   }
 
-  const endpoint =
-    urlInfo.type === GitHubResourceType.PullRequest ? "pulls" : "issues";
-  const apiUrl = `https://api.github.com/repos/${urlInfo.owner}/${urlInfo.repo}/${endpoint}/${urlInfo.number}`;
+  headers(): Record<string, string> {
+    const headers: Record<string, string> = {
+      Accept: "application/vnd.github.v3+json",
+    };
 
-  try {
-    const response = UrlFetchApp.fetch(apiUrl, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/vnd.github.v3+json",
-      },
-      muteHttpExceptions: true,
-    });
-
-    if (response.getResponseCode() !== 200) {
-      // eslint-disable-next-line no-console
-      console.error(
-        `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
-      );
-      return null;
+    if (this.accessToken) {
+      headers.Authorization = `Bearer ${this.accessToken}`;
     }
 
-    const data = JSON.parse(response.getContentText());
-    return {
-      owner: urlInfo.owner,
-      repo: urlInfo.repo,
-      number: urlInfo.number,
-      title: data.title || "",
-      state: data.state || "unknown",
-      type: urlInfo.type as
-        | GitHubResourceType.Issue
-        | GitHubResourceType.PullRequest,
-    };
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(`Error fetching GitHub data: ${error}`);
-    return null;
+    return headers;
   }
-}
 
-/**
- * Fetch GitHub repository data using the GitHub API
- */
-function fetchRepositoryData(
-  urlInfo: GitHubURLInfo,
-  accessToken: string,
-): GitHubResource | null {
-  const apiUrl = `https://api.github.com/repos/${urlInfo.owner}/${urlInfo.repo}`;
+  /**
+   * Fetch repository details
+   */
+  fetchRepository(owner: string, repo: string): GitHubRepository | null {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}`;
 
-  try {
-    const response = UrlFetchApp.fetch(apiUrl, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        Accept: "application/vnd.github.v3+json",
-      },
-      muteHttpExceptions: true,
-    });
+    try {
+      const response = UrlFetchApp.fetch(apiUrl, {
+        headers: this.headers(),
+        muteHttpExceptions: true,
+      });
 
-    if (response.getResponseCode() !== 200) {
+      if (response.getResponseCode() !== 200) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
+        );
+        return null;
+      }
+
+      return JSON.parse(response.getContentText()) as GitHubRepository;
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(
-        `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
-      );
+      console.error(`Error fetching GitHub repository data: ${error}`);
       return null;
     }
+  }
 
-    const data = JSON.parse(response.getContentText());
-    return {
-      owner: urlInfo.owner,
-      repo: urlInfo.repo,
-      description: data.description || "",
-      type: GitHubResourceType.Repository,
-    };
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(`Error fetching GitHub data: ${error}`);
-    return null;
+  /**
+   * Fetch issue details
+   */
+  fetchIssue(owner: string, repo: string, number: number): GitHubIssue | null {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/issues/${number}`;
+
+    try {
+      const response = UrlFetchApp.fetch(apiUrl, {
+        headers: this.headers(),
+        muteHttpExceptions: true,
+      });
+
+      if (response.getResponseCode() !== 200) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
+        );
+        return null;
+      }
+
+      return JSON.parse(response.getContentText()) as GitHubIssue;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching GitHub issue data: ${error}`);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch pull request details
+   */
+  fetchPullRequest(
+    owner: string,
+    repo: string,
+    number: number,
+  ): GitHubPullRequest | null {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${number}`;
+
+    try {
+      const response = UrlFetchApp.fetch(apiUrl, {
+        headers: this.headers(),
+        muteHttpExceptions: true,
+      });
+
+      if (response.getResponseCode() !== 200) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
+        );
+        return null;
+      }
+
+      return JSON.parse(response.getContentText()) as GitHubPullRequest;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching GitHub pull request data: ${error}`);
+      return null;
+    }
   }
 }

@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { parseGitHubURL, fetchGitHubData } from "./github.js";
-import { getAccessToken } from "./oauth.js";
-import { createPreviewCard } from "./ui.js";
+import { parseGitHubURL, GitHubAPIClient } from "./github.js";
+import { getAccessToken, getAuthorizationUrl } from "./oauth.js";
+import {
+  createRepositoryCard,
+  createIssueCard,
+  createPullRequestCard,
+} from "./ui.js";
+import { GITHUB_LOGO } from "./logos.js";
 
 /**
  * Handle link preview requests for GitHub URLs
@@ -22,10 +27,14 @@ import { createPreviewCard } from "./ui.js";
 export function onLinkPreview(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event: any,
-):
-  | GoogleAppsScript.Card_Service.Card[]
-  | GoogleAppsScript.Card_Service.UniversalActionResponse {
-  const url = event?.docs?.matchedUrl?.url;
+): GoogleAppsScript.Card_Service.Card[] {
+  let url = event?.docs?.matchedUrl?.url;
+  if (!url) {
+    url = event?.sheets?.matchedUrl?.url;
+  }
+  if (!url) {
+    url = event?.slides?.matchedUrl?.url;
+  }
 
   if (!url) {
     return [];
@@ -37,35 +46,130 @@ export function onLinkPreview(
   }
 
   const accessToken = getAccessToken();
-  if (!accessToken) {
-    // Return authorization card if not authenticated
-    return [createAuthorizationCard()];
+  const client = new GitHubAPIClient(accessToken || "");
+
+  // First try to fetch data (works for public repos even without token)
+  let card: GoogleAppsScript.Card_Service.Card | null = null;
+  switch (urlInfo.type) {
+    case "repository": {
+      const repo = client.fetchRepository(urlInfo.owner, urlInfo.repo);
+      if (!repo) {
+        break;
+      }
+      card = createRepositoryCard(repo);
+      break;
+    }
+    case "issue": {
+      if (urlInfo.number) {
+        const issue = client.fetchIssue(
+          urlInfo.owner,
+          urlInfo.repo,
+          urlInfo.number,
+        );
+        if (!issue) {
+          break;
+        }
+        card = createIssueCard(issue);
+      }
+      break;
+    }
+    case "pull_request": {
+      if (urlInfo.number) {
+        const pull = client.fetchPullRequest(
+          urlInfo.owner,
+          urlInfo.repo,
+          urlInfo.number,
+        );
+        if (!pull) {
+          break;
+        }
+        card = createPullRequestCard(pull);
+      }
+      break;
+    }
   }
 
-  const data = fetchGitHubData(urlInfo, accessToken);
-  if (!data) {
-    return [];
+  // If we got no data and no token, try to get auth
+  if (!card && !accessToken) {
+    CardService.newAuthorizationException()
+      .setAuthorizationUrl(getAuthorizationUrl())
+      .setResourceDisplayName("GitHub Account")
+      .setCustomUiCallback("createAuthorizationCard")
+      .throwException();
   }
 
-  return [createPreviewCard(data)];
+  // If we still have no data but have a token, there might be another issue
+  if (!card) {
+    return [
+      createErrorCard(
+        "Unable to fetch repository data. The repository may not exist or you may not have access to it.",
+      ),
+    ];
+  }
+
+  return [card];
 }
 
 /**
  * Create a card prompting user to authorize
  */
-function createAuthorizationCard(): GoogleAppsScript.Card_Service.Card {
+export function createAuthorizationCard(): GoogleAppsScript.Card_Service.Card {
   return CardService.newCardBuilder()
     .setHeader(
-      CardService.newCardHeader().setTitle(
-        "GitHub Smart Chips - Authorization Required",
-      ),
+      CardService.newCardHeader()
+        .setTitle("GitHub Smart Chips")
+        .setSubtitle("Authorization Required")
+        .setImageUrl(GITHUB_LOGO),
+    )
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(
+          CardService.newTextParagraph().setText(
+            "To view private GitHub repositories and get detailed information, please authorize this add-on to access your GitHub account.",
+          ),
+        )
+        .addWidget(
+          CardService.newTextButton()
+            .setText("Authorize GitHub Access")
+            .setOpenLink(
+              CardService.newOpenLink()
+                .setUrl(getAuthorizationUrl())
+                .setOpenAs(CardService.OpenAs.OVERLAY)
+                .setOnClose(CardService.OnClose.RELOAD),
+            ),
+        ),
     )
     .addSection(
       CardService.newCardSection().addWidget(
         CardService.newTextParagraph().setText(
-          "Please authorize this add-on to access GitHub.",
+          "Note: Public repositories may still be accessible without authorization.",
         ),
       ),
+    )
+    .build();
+}
+
+/**
+ * Create an error card to display when something goes wrong
+ */
+function createErrorCard(message: string): GoogleAppsScript.Card_Service.Card {
+  return CardService.newCardBuilder()
+    .setHeader(
+      CardService.newCardHeader()
+        .setTitle("GitHub Smart Chips")
+        .setSubtitle("Error")
+        .setImageUrl(GITHUB_LOGO),
+    )
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(CardService.newTextParagraph().setText(message))
+        .addWidget(
+          CardService.newTextButton()
+            .setText("Try Again")
+            .setOnClickAction(
+              CardService.newAction().setFunctionName("resetAuth"),
+            ),
+        ),
     )
     .build();
 }

@@ -13,89 +13,238 @@
 // limitations under the License.
 
 import {
-  GitHubResourceType,
-  type GitHubResource,
-  type GitHubIssueOrPR,
   type GitHubRepository,
+  type GitHubIssue,
+  type GitHubPullRequest,
 } from "./types.js";
 
-// GitHub Octocat logo image as base64 data URL
-const GITHUB_LOGO =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVFiF7ZdPaBxVHMe/v5nZbJO0TZPapKYxpY0Yq0JEaRUUxFLwIIJ4EARvHkQP0osHQfDgRRAPnoSKB8VDQQ8KHqSFihURRfBQRVpQqI0xadJNszWb3d3Z2dl5j8NmN5vNH9vUpIL5wuPNb97v/T7fN2/ezAMeVuJBCkTkJID3APQA6BKRNgBNAGoB3AVwB8AWgKsicgXA5yJydV+Agf4rL3z7+omdqo5rKztXdN9+dOJU6tDJ0+bQ8VMmfviktf+ZseLE2Fi1euzZYd04c6Y+OjGxUJmY+KYyOfltdXJyuTo1dWOflWIA5wCcE5HovgA+X/2yuv1oV9Qb+PXs5Kl2M37mjWji+YnRysSxF6uTZybqEy+8lI+d/deRfRYuicg7IrJ8XwCfrz4rIl/uVNP2V5enj8VPPnc0evSpV6KJyVeq55+fSPd78HEROSsif+0L4PPVL0XkRVvVw1+dfyc6cuK16OSp16vnn39p38ADQQA0ApgCUNqppp0vPjk7Gi09+nz0+DO/7vfYBxQAGADgA9AFoNNRtwDoAlB0lL9Q8Tfu3g4vfPiTQ+kHaD+fYgv/A4wCqDrKH2x4Tdbvu4HvA0sAtAMod9Q/MNQBeB/AbQCLAH4EsATgBoDzANJ/1xxlG8CnInIRQHhfuQDg85O/ALge5kzv+FNvmo5cxw/FfF6jRr/Bs29evHr+3LsNQHm/gHM+X/0CwKyI/NvgPPxV1iJz5t1/lxa/8EF8evuJR9sDQ/kHlzSPqWqPqu7cSyZiS4sl9Pd/uB4EQ+P3mxWAaICPAYQAsoH+yyurv3zU3Oz0H6y1nq2saZX5/S+LyA9ARkQyAO4CeBfAUwBONebCfj31TWdbi/3lv1spnP/hYrZleGt/U3ABJP/XKgDgm0vnvr52efrNtsO9b/vb10wul0tYa2k2m1Y/fPgvVf3QDDQ/C+Ddzb8uv7JVWj8zevKli5euvPH04SevJWa3Gvb7d1e+u3OPHXi/+tdzm/w9PnQ+DeBXEfnWoW1pCg4BqLTIr4pIa4v8QKYgByAJIBGVU9a+d+2kxSwAF/qHy+R+TQG473T0sNK/Jt70ZXpQXWkAAAAASUVORK5CYII=";
+import { relativeTime, trimString } from "./utils.js";
+
+import { GITHUB_LOGO } from "./logos.js";
 
 /**
- * Create a preview card for a GitHub resource
+ * Create a preview card for a GitHub issue
  */
-export function createPreviewCard(
-  data: GitHubResource,
+export function createIssueCard(
+  data: GitHubIssue,
 ): GoogleAppsScript.Card_Service.Card {
-  if (data.type === GitHubResourceType.Repository) {
-    return createRepositoryCard(data);
-  } else {
-    return createIssueOrPRCard(data);
+  const cardTitle = `${data.repo.full_name}#${data.number}: ${data.title}`;
+  const repoUrl = `https://github.com/${data.repo.full_name}`;
+  const itemUrl = `${repoUrl}/issues/${data.number}`;
+
+  // Format the created date
+  const createdDate = new Date(data.created_at).toLocaleDateString();
+
+  // Truncate body to first 50 characters
+  const bodySnippet = trimString(data.body || "", 50);
+
+  // Create state indicator with appropriate icon
+  const stateIcon = data.state === "closed" ? "🔴" : "🟢";
+
+  const cardBuilder = CardService.newCardBuilder()
+    .setHeader(
+      CardService.newCardHeader()
+        .setTitle(cardTitle)
+        .setSubtitle(`${stateIcon} Issue #${data.number} • ${data.state}`)
+        .setImageUrl(GITHUB_LOGO),
+    )
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Repository")
+            .setContent(data.repo.full_name)
+            .setOpenLink(CardService.newOpenLink().setUrl(repoUrl)),
+        )
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Created")
+            .setContent(`${createdDate} by ${data.user.login}`),
+        ),
+    );
+
+  // Add body snippet if available
+  if (bodySnippet) {
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newTextParagraph().setText(bodySnippet),
+      ),
+    );
   }
+
+  // Add labels section if any labels exist
+  if (data.labels && data.labels.length > 0) {
+    const labelsText = data.labels.map((label) => label.name).join(", ");
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue().setTopLabel("Labels").setContent(labelsText),
+      ),
+    );
+  }
+
+  // Add action button to view on GitHub
+  cardBuilder.addSection(
+    CardService.newCardSection().addWidget(
+      CardService.newTextButton()
+        .setText("View Issue on GitHub")
+        .setOpenLink(CardService.newOpenLink().setUrl(itemUrl)),
+    ),
+  );
+
+  return cardBuilder.build();
 }
 
 /**
- * Create a preview card for a GitHub issue or PR
+ * Create a preview card for a GitHub pull request
  */
-function createIssueOrPRCard(
-  data: GitHubIssueOrPR,
+export function createPullRequestCard(
+  data: GitHubPullRequest,
 ): GoogleAppsScript.Card_Service.Card {
-  const type = data.type === GitHubResourceType.PullRequest ? "PR" : "Issue";
-  const title = `${data.owner}/${data.repo} #${data.number}`;
-  const subtitle = `${type}: ${data.title}`;
+  const cardTitle = `${data.base.repo.full_name}#${data.number}: ${data.title}`;
+  const repoUrl = `https://github.com/${data.base.repo.full_name}`;
+  const itemUrl = `${repoUrl}/pull/${data.number}`;
 
-  return CardService.newCardBuilder()
+  // Format the created date
+  const createdDate = new Date(data.created_at).toLocaleDateString();
+
+  // Truncate body to first 50 characters
+  const bodySnippet = trimString(data.body || "", 50);
+
+  // Create state indicator with appropriate icon
+  let stateIcon = "🟢"; // open
+  if (data.state === "closed") {
+    stateIcon = data.merged ? "🟣" : "🔴";
+  }
+
+  const cardBuilder = CardService.newCardBuilder()
     .setHeader(
       CardService.newCardHeader()
-        .setTitle(title)
-        .setSubtitle(subtitle)
+        .setTitle(cardTitle)
+        .setSubtitle(
+          `${stateIcon} Pull Request #${data.number} • ${data.state}`,
+        )
         .setImageUrl(GITHUB_LOGO),
     )
-    .build();
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Repository")
+            .setContent(data.base.repo.full_name)
+            .setOpenLink(CardService.newOpenLink().setUrl(repoUrl)),
+        )
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Created")
+            .setContent(`${createdDate} by ${data.user.login}`),
+        ),
+    );
+
+  // Add body snippet if available
+  if (bodySnippet) {
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newTextParagraph().setText(bodySnippet),
+      ),
+    );
+  }
+
+  // Add labels section if any labels exist
+  if (data.labels && data.labels.length > 0) {
+    const labelsText = data.labels.map((label) => label.name).join(", ");
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue().setTopLabel("Labels").setContent(labelsText),
+      ),
+    );
+  }
+
+  // Add branch information
+  if (data.base && data.head) {
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Branches")
+          .setContent(`${data.base.ref} ← ${data.head.ref}`),
+      ),
+    );
+  }
+
+  // Add action button to view on GitHub
+  cardBuilder.addSection(
+    CardService.newCardSection().addWidget(
+      CardService.newTextButton()
+        .setText("View Pull Request on GitHub")
+        .setOpenLink(CardService.newOpenLink().setUrl(itemUrl)),
+    ),
+  );
+
+  return cardBuilder.build();
 }
 
 /**
  * Create a preview card for a GitHub repository
  */
-function createRepositoryCard(
+export function createRepositoryCard(
   data: GitHubRepository,
 ): GoogleAppsScript.Card_Service.Card {
-  const title = `${data.owner}/${data.repo}`;
   const subtitle = data.description || "GitHub Repository";
 
-  return CardService.newCardBuilder()
+  // Format the updated date
+  const updatedDate = new Date(data.updated_at);
+  const now = new Date();
+
+  const updatedText = `updated ${relativeTime(now, updatedDate)}`;
+
+  const cardBuilder = CardService.newCardBuilder()
     .setHeader(
       CardService.newCardHeader()
-        .setTitle(title)
+        .setTitle(data.full_name)
         .setSubtitle(subtitle)
         .setImageUrl(GITHUB_LOGO),
     )
-    .build();
-}
+    .addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Visibility")
+          .setContent(data.private ? "🔒 Private" : "🌐 Public"),
+      ),
+    );
 
-/**
- * Create a smart chip widget for a GitHub URL
- */
-export function createSmartChip(
-  url: string,
-  data: GitHubResource,
-): Record<string, unknown> {
-  if (data.type === GitHubResourceType.Repository) {
-    const chipText = `${data.owner}/${data.repo}`;
-    return {
-      text: chipText,
-      iconUrl: GITHUB_LOGO,
-      title: data.description,
-    };
-  } else {
-    const type = data.type === GitHubResourceType.PullRequest ? "PR" : "Issue";
-    const chipText = `${data.owner}/${data.repo} ${type} #${data.number}`;
-    return {
-      text: chipText,
-      iconUrl: GITHUB_LOGO,
-      title: data.title,
-    };
+  // Add language if available
+  if (data.language) {
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Language")
+          .setContent(data.language),
+      ),
+    );
   }
+
+  // Add stats section
+  cardBuilder.addSection(
+    CardService.newCardSection()
+      .addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Stats")
+          .setContent(`⭐ ${data.stargazers_count} • 🍴 ${data.forks_count}`),
+      )
+      .addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Last Updated")
+          .setContent(updatedText),
+      ),
+  );
+
+  // Add action button to view on GitHub
+  cardBuilder.addSection(
+    CardService.newCardSection().addWidget(
+      CardService.newTextButton()
+        .setText("View Repository on GitHub")
+        .setOpenLink(CardService.newOpenLink().setUrl(data.html_url)),
+    ),
+  );
+
+  return cardBuilder.build();
 }
