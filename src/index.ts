@@ -13,12 +13,14 @@
 // limitations under the License.
 
 // Export all public functions for Apps Script
-import { onLinkPreview } from "./addon.js";
+import { onLinkPreview, createAuthorizationCard } from "./addon.js";
 import { authCallback, getAuthorizationUrl, resetAuth } from "./oauth.js";
 
 // Re-export classes that should be accessible in Google Apps Script:
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).onLinkPreview = onLinkPreview;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(globalThis as any).createAuthorizationCard = createAuthorizationCard;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).authCallback = authCallback;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

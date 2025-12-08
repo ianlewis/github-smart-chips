@@ -79,7 +79,11 @@ export function onLinkPreview(
 
   // If we got no data and no token, try to get auth
   if (!data && !accessToken) {
-    return [createAuthorizationCard()];
+    CardService.newAuthorizationException()
+      .setAuthorizationUrl(getAuthorizationUrl())
+      .setResourceDisplayName("GitHub Account")
+      .setCustomUiCallback("createAuthorizationCard")
+      .throwException();
   }
 
   // If we still have no data but have a token, there might be another issue
@@ -113,7 +117,7 @@ export function onLinkPreview(
 /**
  * Create a card prompting user to authorize
  */
-function createAuthorizationCard(): GoogleAppsScript.Card_Service.Card {
+export function createAuthorizationCard(): GoogleAppsScript.Card_Service.Card {
   return CardService.newCardBuilder()
     .setHeader(
       CardService.newCardHeader()
