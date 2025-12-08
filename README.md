@@ -1,5 +1,9 @@
 # GitHub Smart Chips
 
+[![tests](https://github.com/ianlewis/github-smart-chips/actions/workflows/pull_request.tests.yml/badge.svg)](https://github.com/ianlewis/github-smart-chips/actions/workflows/pull_request.tests.yml)
+[![Codecov](https://codecov.io/gh/ianlewis/github-smart-chips/graph/badge.svg?token=5F4B33RNHD)](https://codecov.io/gh/ianlewis/github-smart-chips)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ianlewis/github-smart-chips/badge)](https://securityscorecards.dev/viewer/?uri=github.com%2Fianlewis%2Fgithub-smart-chips)
+
 A Google Docs add-on that provides smart chips with preview links for GitHub
 issues and pull requests. This add-on displays GitHub issue and PR information
 directly in Google Docs with rich preview cards.
