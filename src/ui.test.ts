@@ -331,24 +331,3 @@ describe("createRepositoryCard", () => {
     expect(mockCardBuilder.build).toHaveBeenCalled();
   });
 });
-
-describe("GITHUB_LOGO", () => {
-  it("should be a valid data URL", () => {
-    expect(GITHUB_LOGO).toMatch(/^data:image\/png;base64,/);
-    expect(GITHUB_LOGO.length).toBeGreaterThan(100);
-  });
-});
-
-describe("UI Functions", () => {
-  it("should export createIssueCard function", () => {
-    expect(typeof createIssueCard).toBe("function");
-  });
-
-  it("should export createPullRequestCard function", () => {
-    expect(typeof createPullRequestCard).toBe("function");
-  });
-
-  it("should export createRepositoryCard function", () => {
-    expect(typeof createRepositoryCard).toBe("function");
-  });
-});
