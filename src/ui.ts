@@ -28,8 +28,8 @@ import { GITHUB_LOGO } from "./logos.js";
 export function createIssueCard(
   data: GitHubIssue,
 ): GoogleAppsScript.Card_Service.Card {
-  const cardTitle = `${data.owner}/${data.repo}#${data.number}: ${data.title}`;
-  const repoUrl = `https://github.com/${data.owner}/${data.repo}`;
+  const cardTitle = `${data.repo.full_name}#${data.number}: ${data.title}`;
+  const repoUrl = `https://github.com/${data.repo.full_name}`;
   const itemUrl = `${repoUrl}/issues/${data.number}`;
 
   // Format the created date
@@ -53,7 +53,7 @@ export function createIssueCard(
         .addWidget(
           CardService.newKeyValue()
             .setTopLabel("Repository")
-            .setContent(`${data.owner}/${data.repo}`)
+            .setContent(data.repo.full_name)
             .setOpenLink(CardService.newOpenLink().setUrl(repoUrl)),
         )
         .addWidget(
@@ -100,8 +100,8 @@ export function createIssueCard(
 export function createPullRequestCard(
   data: GitHubPullRequest,
 ): GoogleAppsScript.Card_Service.Card {
-  const cardTitle = `${data.owner}/${data.repo}#${data.number}: ${data.title}`;
-  const repoUrl = `https://github.com/${data.owner}/${data.repo}`;
+  const cardTitle = `${data.base.repo.full_name}#${data.number}: ${data.title}`;
+  const repoUrl = `https://github.com/${data.base.repo.full_name}`;
   const itemUrl = `${repoUrl}/pull/${data.number}`;
 
   // Format the created date
@@ -130,7 +130,7 @@ export function createPullRequestCard(
         .addWidget(
           CardService.newKeyValue()
             .setTopLabel("Repository")
-            .setContent(`${data.owner}/${data.repo}`)
+            .setContent(data.base.repo.full_name)
             .setOpenLink(CardService.newOpenLink().setUrl(repoUrl)),
         )
         .addWidget(
@@ -188,7 +188,6 @@ export function createPullRequestCard(
 export function createRepositoryCard(
   data: GitHubRepository,
 ): GoogleAppsScript.Card_Service.Card {
-  const repoName = `${data.owner}/${data.repo}`;
   const subtitle = data.description || "GitHub Repository";
 
   // Format the updated date
@@ -200,7 +199,7 @@ export function createRepositoryCard(
   const cardBuilder = CardService.newCardBuilder()
     .setHeader(
       CardService.newCardHeader()
-        .setTitle(repoName)
+        .setTitle(data.full_name)
         .setSubtitle(subtitle)
         .setImageUrl(GITHUB_LOGO),
     )

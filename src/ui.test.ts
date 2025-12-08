@@ -83,8 +83,20 @@ beforeEach(() => {
 describe("createIssueCard", () => {
   it("should create a card for an open issue", () => {
     const data: GitHubIssue = {
-      owner: "octocat",
-      repo: "hello-world",
+      repo: {
+        name: "hello-world",
+        full_name: "octocat/hello-world",
+        owner: {
+          login: "octocat",
+          avatar_url: "",
+          html_url: "",
+        },
+        private: false,
+        stargazers_count: 0,
+        forks_count: 0,
+        updated_at: "",
+        html_url: "",
+      },
       number: 123,
       title: "Test Issue",
       state: "open",
@@ -117,8 +129,20 @@ describe("createIssueCard", () => {
 
   it("should create a card for a closed issue", () => {
     const data: GitHubIssue = {
-      owner: "octocat",
-      repo: "hello-world",
+      repo: {
+        name: "hello-world",
+        full_name: "octocat/hello-world",
+        owner: {
+          login: "octocat",
+          avatar_url: "",
+          html_url: "",
+        },
+        private: false,
+        stargazers_count: 0,
+        forks_count: 0,
+        updated_at: "",
+        html_url: "",
+      },
       number: 123,
       title: "Closed Issue",
       state: "closed",
@@ -141,8 +165,20 @@ describe("createIssueCard", () => {
 
   it("should handle issue with no body", () => {
     const data: GitHubIssue = {
-      owner: "octocat",
-      repo: "hello-world",
+      repo: {
+        name: "hello-world",
+        full_name: "octocat/hello-world",
+        owner: {
+          login: "octocat",
+          avatar_url: "",
+          html_url: "",
+        },
+        private: false,
+        stargazers_count: 0,
+        forks_count: 0,
+        updated_at: "",
+        html_url: "",
+      },
       number: 123,
       title: "Issue Without Body",
       state: "open",
@@ -165,8 +201,6 @@ describe("createIssueCard", () => {
 describe("createPullRequestCard", () => {
   it("should create a card for an open pull request", () => {
     const data: GitHubPullRequest = {
-      owner: "octocat",
-      repo: "hello-world",
       number: 456,
       title: "Test PR",
       state: "open",
@@ -179,8 +213,40 @@ describe("createPullRequestCard", () => {
       },
       labels: [],
       merged: false,
-      base: { ref: "main" },
-      head: { ref: "feature-branch" },
+      base: {
+        ref: "main",
+        repo: {
+          name: "hello-world",
+          full_name: "octocat/hello-world",
+          owner: {
+            login: "octocat",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
+      },
+      head: {
+        ref: "feature-branch",
+        repo: {
+          name: "hello-world",
+          full_name: "octocat/hello-world",
+          owner: {
+            login: "octocat",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
+      },
     };
 
     createPullRequestCard(data);
@@ -198,8 +264,6 @@ describe("createPullRequestCard", () => {
 
   it("should create a card for a merged pull request", () => {
     const data: GitHubPullRequest = {
-      owner: "octocat",
-      repo: "hello-world",
       number: 456,
       title: "Merged PR",
       state: "closed",
@@ -212,8 +276,40 @@ describe("createPullRequestCard", () => {
       },
       labels: [],
       merged: true,
-      base: { ref: "main" },
-      head: { ref: "feature-branch" },
+      base: {
+        ref: "main",
+        repo: {
+          name: "hello-world",
+          full_name: "octocat/hello-world",
+          owner: {
+            login: "octocat",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
+      },
+      head: {
+        ref: "feature-branch",
+        repo: {
+          name: "hello-world",
+          full_name: "octocat/hello-world",
+          owner: {
+            login: "octocat",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
+      },
     };
 
     createPullRequestCard(data);
@@ -225,8 +321,6 @@ describe("createPullRequestCard", () => {
 
   it("should create a card for a closed but not merged pull request", () => {
     const data: GitHubPullRequest = {
-      owner: "octocat",
-      repo: "hello-world",
       number: 456,
       title: "Closed PR",
       state: "closed",
@@ -239,8 +333,40 @@ describe("createPullRequestCard", () => {
       },
       labels: [],
       merged: false,
-      base: { ref: "main" },
-      head: { ref: "feature-branch" },
+      base: {
+        ref: "main",
+        repo: {
+          name: "hello-world",
+          full_name: "octocat/hello-world",
+          owner: {
+            login: "octocat",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
+      },
+      head: {
+        ref: "feature-branch",
+        repo: {
+          name: "hello-world",
+          full_name: "octocat/hello-world",
+          owner: {
+            login: "octocat",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
+      },
     };
 
     createPullRequestCard(data);
@@ -254,9 +380,14 @@ describe("createPullRequestCard", () => {
 describe("createRepositoryCard", () => {
   it("should create a card for a public repository", () => {
     const data: GitHubRepository = {
-      owner: "octocat",
-      repo: "hello-world",
+      name: "hello-world",
+      full_name: "octocat/hello-world",
       description: "A test repository",
+      owner: {
+        login: "octocat",
+        avatar_url: "",
+        html_url: "",
+      },
       private: false,
       language: "TypeScript",
       stargazers_count: 100,
@@ -278,9 +409,14 @@ describe("createRepositoryCard", () => {
 
   it("should create a card for a private repository", () => {
     const data: GitHubRepository = {
-      owner: "octocat",
-      repo: "private-repo",
+      name: "private-repo",
+      full_name: "octocat/private-repo",
       description: "A private repository",
+      owner: {
+        login: "octocat",
+        avatar_url: "",
+        html_url: "",
+      },
       private: true,
       language: "JavaScript",
       stargazers_count: 5,
@@ -297,8 +433,13 @@ describe("createRepositoryCard", () => {
 
   it("should handle repository with no description", () => {
     const data: GitHubRepository = {
-      owner: "octocat",
-      repo: "no-desc-repo",
+      name: "no-desc-repo",
+      full_name: "octocat/no-desc-repo",
+      owner: {
+        login: "octocat",
+        avatar_url: "",
+        html_url: "",
+      },
       private: false,
       stargazers_count: 0,
       forks_count: 0,
@@ -315,9 +456,14 @@ describe("createRepositoryCard", () => {
 
   it("should handle repository with no language", () => {
     const data: GitHubRepository = {
-      owner: "octocat",
-      repo: "no-lang-repo",
+      name: "no-lang-repo",
+      full_name: "octocat/no-lang-repo",
       description: "Repository without main language",
+      owner: {
+        login: "octocat",
+        avatar_url: "",
+        html_url: "",
+      },
       private: false,
       stargazers_count: 0,
       forks_count: 0,

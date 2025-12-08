@@ -102,18 +102,7 @@ export class GitHubAPIClient {
         return null;
       }
 
-      const data = JSON.parse(response.getContentText());
-      return {
-        owner,
-        repo,
-        description: data.description || "",
-        private: data.private || false,
-        language: data.language || null,
-        stargazers_count: data.stargazers_count || 0,
-        forks_count: data.forks_count || 0,
-        updated_at: data.updated_at || "",
-        html_url: data.html_url || "",
-      };
+      return JSON.parse(response.getContentText()) as GitHubRepository;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error fetching GitHub repository data: ${error}`);
@@ -141,22 +130,7 @@ export class GitHubAPIClient {
         return null;
       }
 
-      const data = JSON.parse(response.getContentText());
-      return {
-        owner,
-        repo,
-        number,
-        title: data.title || "",
-        state: data.state || "unknown",
-        body: data.body || "",
-        created_at: data.created_at || "",
-        user: {
-          login: data.user?.login || "",
-          avatar_url: data.user?.avatar_url || "",
-          html_url: data.user?.html_url || "",
-        },
-        labels: data.labels || [],
-      };
+      return JSON.parse(response.getContentText()) as GitHubIssue;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error fetching GitHub issue data: ${error}`);
@@ -188,25 +162,7 @@ export class GitHubAPIClient {
         return null;
       }
 
-      const data = JSON.parse(response.getContentText());
-      return {
-        owner,
-        repo,
-        number,
-        title: data.title || "",
-        state: data.state || "unknown",
-        body: data.body || "",
-        created_at: data.created_at || "",
-        user: {
-          login: data.user?.login || "",
-          avatar_url: data.user?.avatar_url || "",
-          html_url: data.user?.html_url || "",
-        },
-        labels: data.labels || [],
-        merged: data.merged || false,
-        base: { ref: data.base?.ref || "" },
-        head: { ref: data.head?.ref || "" },
-      };
+      return JSON.parse(response.getContentText()) as GitHubPullRequest;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error fetching GitHub pull request data: ${error}`);

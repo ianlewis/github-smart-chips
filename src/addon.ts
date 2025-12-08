@@ -19,11 +19,6 @@ import {
   createIssueCard,
   createPullRequestCard,
 } from "./ui.js";
-import {
-  type GitHubRepository,
-  type GitHubIssue,
-  type GitHubPullRequest,
-} from "./types.js";
 import { GITHUB_LOGO } from "./logos.js";
 
 /**
@@ -32,9 +27,7 @@ import { GITHUB_LOGO } from "./logos.js";
 export function onLinkPreview(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   event: any,
-):
-  | GoogleAppsScript.Card_Service.Card[]
-  | GoogleAppsScript.Card_Service.UniversalActionResponse {
+): GoogleAppsScript.Card_Service.Card[] {
   let url = event?.docs?.matchedUrl?.url;
   if (!url) {
     url = event?.sheets?.matchedUrl?.url;
@@ -56,29 +49,48 @@ export function onLinkPreview(
   const client = new GitHubAPIClient(accessToken || "");
 
   // First try to fetch data (works for public repos even without token)
-  let data = null;
+  let card: GoogleAppsScript.Card_Service.Card | null = null;
   switch (urlInfo.type) {
-    case "repository":
-      data = client.fetchRepository(urlInfo.owner, urlInfo.repo);
-      break;
-    case "issue":
-      if (urlInfo.number) {
-        data = client.fetchIssue(urlInfo.owner, urlInfo.repo, urlInfo.number);
+    case "repository": {
+      const repo = client.fetchRepository(urlInfo.owner, urlInfo.repo);
+      if (!repo) {
+        break;
       }
+      card = createRepositoryCard(repo);
       break;
-    case "pull_request":
+    }
+    case "issue": {
       if (urlInfo.number) {
-        data = client.fetchPullRequest(
+        const issue = client.fetchIssue(
           urlInfo.owner,
           urlInfo.repo,
           urlInfo.number,
         );
+        if (!issue) {
+          break;
+        }
+        card = createIssueCard(issue);
       }
       break;
+    }
+    case "pull_request": {
+      if (urlInfo.number) {
+        const pull = client.fetchPullRequest(
+          urlInfo.owner,
+          urlInfo.repo,
+          urlInfo.number,
+        );
+        if (!pull) {
+          break;
+        }
+        card = createPullRequestCard(pull);
+      }
+      break;
+    }
   }
 
   // If we got no data and no token, try to get auth
-  if (!data && !accessToken) {
+  if (!card && !accessToken) {
     CardService.newAuthorizationException()
       .setAuthorizationUrl(getAuthorizationUrl())
       .setResourceDisplayName("GitHub Account")
@@ -87,28 +99,12 @@ export function onLinkPreview(
   }
 
   // If we still have no data but have a token, there might be another issue
-  if (!data) {
+  if (!card) {
     return [
       createErrorCard(
         "Unable to fetch repository data. The repository may not exist or you may not have access to it.",
       ),
     ];
-  }
-
-  // Create the appropriate card based on the URL type and data
-  let card: GoogleAppsScript.Card_Service.Card;
-  switch (urlInfo.type) {
-    case "repository":
-      card = createRepositoryCard(data as GitHubRepository);
-      break;
-    case "issue":
-      card = createIssueCard(data as GitHubIssue);
-      break;
-    case "pull_request":
-      card = createPullRequestCard(data as GitHubPullRequest);
-      break;
-    default:
-      return [];
   }
 
   return [card];

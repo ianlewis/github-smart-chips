@@ -34,14 +34,13 @@ export interface GitHubLabel {
  * GitHub issue data
  */
 export interface GitHubIssue {
-  owner: string;
-  repo: string;
   number: number;
   title: string;
   state: string;
   body?: string;
   created_at: string;
   user: GitHubUser;
+  repo: GitHubRepository;
   labels: GitHubLabel[];
 }
 
@@ -49,8 +48,6 @@ export interface GitHubIssue {
  * GitHub pull request data
  */
 export interface GitHubPullRequest {
-  owner: string;
-  repo: string;
   number: number;
   title: string;
   state: string;
@@ -59,11 +56,13 @@ export interface GitHubPullRequest {
   user: GitHubUser;
   labels: GitHubLabel[];
   merged?: boolean;
-  base?: {
+  base: {
     ref: string;
+    repo: GitHubRepository;
   };
-  head?: {
+  head: {
     ref: string;
+    repo: GitHubRepository;
   };
 }
 
@@ -71,8 +70,9 @@ export interface GitHubPullRequest {
  * GitHub repository data
  */
 export interface GitHubRepository {
-  owner: string;
-  repo: string;
+  owner: GitHubUser;
+  name: string;
+  full_name: string;
   description?: string;
   private: boolean;
   language?: string;

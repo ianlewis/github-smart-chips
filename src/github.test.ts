@@ -158,6 +158,13 @@ describe("GitHubAPIClient", () => {
         getResponseCode: () => 200,
         getContentText: () =>
           JSON.stringify({
+            name: "repo",
+            full_name: "test/repo",
+            owner: {
+              login: "test",
+              avatar_url: "",
+              html_url: "",
+            },
             description: "A test repository",
             private: false,
             language: "TypeScript",
@@ -174,8 +181,13 @@ describe("GitHubAPIClient", () => {
       const result = client.fetchRepository("test", "repo");
 
       expect(result).toEqual({
-        owner: "test",
-        repo: "repo",
+        name: "repo",
+        full_name: "test/repo",
+        owner: {
+          login: "test",
+          avatar_url: "",
+          html_url: "",
+        },
         description: "A test repository",
         private: false,
         language: "TypeScript",
@@ -252,6 +264,7 @@ describe("GitHubAPIClient", () => {
         getContentText: () =>
           JSON.stringify({
             title: "Test Issue",
+            number: 123,
             state: "open",
             body: "Issue description",
             created_at: "2023-01-01T00:00:00Z",
@@ -261,6 +274,20 @@ describe("GitHubAPIClient", () => {
               html_url: "https://github.com/testuser",
             },
             labels: [{ name: "bug", color: "red" }],
+            repo: {
+              name: "repo",
+              full_name: "test/repo",
+              owner: {
+                login: "test",
+                avatar_url: "",
+                html_url: "",
+              },
+              private: false,
+              stargazers_count: 0,
+              forks_count: 0,
+              updated_at: "",
+              html_url: "",
+            },
           }),
       };
 
@@ -270,8 +297,20 @@ describe("GitHubAPIClient", () => {
       const result = client.fetchIssue("test", "repo", 123);
 
       expect(result).toEqual({
-        owner: "test",
-        repo: "repo",
+        repo: {
+          name: "repo",
+          full_name: "test/repo",
+          owner: {
+            login: "test",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
         number: 123,
         title: "Test Issue",
         state: "open",
@@ -308,6 +347,7 @@ describe("GitHubAPIClient", () => {
         getContentText: () =>
           JSON.stringify({
             title: "Test PR",
+            number: 456,
             state: "open",
             body: "PR description",
             created_at: "2023-01-01T00:00:00Z",
@@ -320,6 +360,20 @@ describe("GitHubAPIClient", () => {
             merged: false,
             base: { ref: "main" },
             head: { ref: "feature" },
+            repo: {
+              name: "repo",
+              full_name: "test/repo",
+              owner: {
+                login: "test",
+                avatar_url: "",
+                html_url: "",
+              },
+              private: false,
+              stargazers_count: 0,
+              forks_count: 0,
+              updated_at: "",
+              html_url: "",
+            },
           }),
       };
 
@@ -329,8 +383,6 @@ describe("GitHubAPIClient", () => {
       const result = client.fetchPullRequest("test", "repo", 456);
 
       expect(result).toEqual({
-        owner: "test",
-        repo: "repo",
         number: 456,
         title: "Test PR",
         state: "open",
@@ -345,6 +397,20 @@ describe("GitHubAPIClient", () => {
         merged: false,
         base: { ref: "main" },
         head: { ref: "feature" },
+        repo: {
+          name: "repo",
+          full_name: "test/repo",
+          owner: {
+            login: "test",
+            avatar_url: "",
+            html_url: "",
+          },
+          private: false,
+          stargazers_count: 0,
+          forks_count: 0,
+          updated_at: "",
+          html_url: "",
+        },
       });
     });
 
