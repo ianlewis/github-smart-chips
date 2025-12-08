@@ -70,12 +70,7 @@ export class GitHubAPIClient {
     this.accessToken = accessToken;
   }
 
-  /**
-   * Fetch repository details
-   */
-  fetchRepository(owner: string, repo: string): GitHubRepository | null {
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}`;
-
+  headers(): Record<string, string> {
     const headers: Record<string, string> = {
       Accept: "application/vnd.github.v3+json",
     };
@@ -84,9 +79,18 @@ export class GitHubAPIClient {
       headers.Authorization = `Bearer ${this.accessToken}`;
     }
 
+    return headers;
+  }
+
+  /**
+   * Fetch repository details
+   */
+  fetchRepository(owner: string, repo: string): GitHubRepository | null {
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}`;
+
     try {
       const response = UrlFetchApp.fetch(apiUrl, {
-        headers,
+        headers: this.headers(),
         muteHttpExceptions: true,
       });
 
@@ -123,17 +127,9 @@ export class GitHubAPIClient {
   fetchIssue(owner: string, repo: string, number: number): GitHubIssue | null {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/issues/${number}`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/vnd.github.v3+json",
-    };
-
-    if (this.accessToken) {
-      headers.Authorization = `Bearer ${this.accessToken}`;
-    }
-
     try {
       const response = UrlFetchApp.fetch(apiUrl, {
-        headers,
+        headers: this.headers(),
         muteHttpExceptions: true,
       });
 
@@ -178,17 +174,9 @@ export class GitHubAPIClient {
   ): GitHubPullRequest | null {
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/pulls/${number}`;
 
-    const headers: Record<string, string> = {
-      Accept: "application/vnd.github.v3+json",
-    };
-
-    if (this.accessToken) {
-      headers.Authorization = `Bearer ${this.accessToken}`;
-    }
-
     try {
       const response = UrlFetchApp.fetch(apiUrl, {
-        headers,
+        headers: this.headers(),
         muteHttpExceptions: true,
       });
 
