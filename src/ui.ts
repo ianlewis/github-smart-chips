@@ -18,7 +18,7 @@ import {
   type GitHubPullRequest,
 } from "./types.js";
 
-import { trimString } from "./utils.js";
+import { relativeTime, trimString } from "./utils.js";
 
 import { GITHUB_LOGO } from "./logos.js";
 
@@ -194,19 +194,8 @@ export function createRepositoryCard(
   // Format the updated date
   const updatedDate = new Date(data.updated_at);
   const now = new Date();
-  const diffTime = Math.abs(now.getTime() - updatedDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-  let updatedText = "updated ";
-  if (diffDays === 1) {
-    updatedText += "yesterday";
-  } else if (diffDays < 7) {
-    updatedText += `${diffDays} days ago`;
-  } else if (diffDays < 30) {
-    updatedText += `${Math.floor(diffDays / 7)} weeks ago`;
-  } else {
-    updatedText += `${Math.floor(diffDays / 30)} months ago`;
-  }
+  const updatedText = `updated ${relativeTime(now, updatedDate)}`;
 
   const cardBuilder = CardService.newCardBuilder()
     .setHeader(
