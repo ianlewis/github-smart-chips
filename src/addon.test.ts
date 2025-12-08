@@ -489,39 +489,6 @@ describe("onLinkPreview", () => {
   });
 
   describe("Client instantiation", () => {
-    it("should create client with access token when available", () => {
-      mockClient.fetchRepository.mockReturnValue({
-        owner: "owner",
-        repo: "repo",
-        description: "Test repo",
-        private: false,
-        stargazers_count: 0,
-        forks_count: 0,
-        updated_at: "2023-01-01T00:00:00Z",
-        html_url: "https://github.com/owner/repo",
-      });
-      mockParseGitHubURL.mockReturnValue({
-        owner: "owner",
-        repo: "repo",
-        type: "repository",
-      });
-      mockGetAccessToken.mockReturnValue("test-token");
-      mockCreateRepositoryCard.mockReturnValue({ id: "mock-card" });
-
-      const event = {
-        docs: {
-          matchedUrl: {
-            url: "https://github.com/owner/repo",
-          },
-        },
-      };
-
-      onLinkPreview(event);
-
-      // Test that function executed successfully (no need to check mock calls)
-      expect(true).toBe(true);
-    });
-
     it("should create client with empty string when no token available", () => {
       mockClient.fetchRepository.mockReturnValue({
         owner: "owner",
@@ -549,10 +516,10 @@ describe("onLinkPreview", () => {
         },
       };
 
-      onLinkPreview(event);
+      const result = onLinkPreview(event);
 
-      // Test that function executed successfully (no need to check mock calls)
-      expect(true).toBe(true);
+      expect(result).toHaveLength(1);
+      expect(mockCardBuilder.build).toHaveBeenCalled();
     });
   });
 });
