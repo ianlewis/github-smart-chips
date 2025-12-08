@@ -166,13 +166,8 @@ function createErrorCard(message: string): GoogleAppsScript.Card_Service.Card {
         .addWidget(
           CardService.newTextButton()
             .setText("Try Again")
-            .setOpenLink(
-              CardService.newOpenLink()
-                .setUrl(
-                  `https://script.google.com/macros/d/${ScriptApp.getScriptId()}/usercallback?function=resetAuth`,
-                )
-                .setOpenAs(CardService.OpenAs.OVERLAY)
-                .setOnClose(CardService.OnClose.RELOAD),
+            .setOnClickAction(
+              CardService.newAction().setFunctionName("resetAuth"),
             ),
         ),
     )

@@ -52,7 +52,6 @@ jest.mock("./ui.js", () => ({
   createIssueCard: (...args: any[]) => mockCreateIssueCard(...args),
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   createPullRequestCard: (...args: any[]) => mockCreatePullRequestCard(...args),
-  GITHUB_LOGO: "data:image/png;base64,test",
 }));
 
 // Mock CardService
