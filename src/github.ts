@@ -130,7 +130,13 @@ export class GitHubAPIClient {
         return null;
       }
 
-      return JSON.parse(response.getContentText()) as GitHubIssue;
+      const issue = JSON.parse(response.getContentText()) as GitHubIssue;
+      const repository = this.fetchRepository(owner, repo);
+      if (!repository) {
+        return null;
+      }
+      issue.repo = repository;
+      return issue;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error fetching GitHub issue data: ${error}`);

@@ -259,7 +259,7 @@ describe("GitHubAPIClient", () => {
 
   describe("fetchIssue", () => {
     it("should fetch issue data successfully", () => {
-      const mockResponse = {
+      const mockIssueResponse = {
         getResponseCode: () => 200,
         getContentText: () =>
           JSON.stringify({
@@ -274,25 +274,32 @@ describe("GitHubAPIClient", () => {
               html_url: "https://github.com/testuser",
             },
             labels: [{ name: "bug", color: "red" }],
-            repo: {
-              name: "repo",
-              full_name: "test/repo",
-              owner: {
-                login: "test",
-                avatar_url: "",
-                html_url: "",
-              },
-              private: false,
-              stargazers_count: 0,
-              forks_count: 0,
-              updated_at: "",
+          }),
+      };
+      const mockRepoResponse = {
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            name: "repo",
+            full_name: "test/repo",
+            owner: {
+              login: "test",
+              avatar_url: "",
               html_url: "",
             },
+            private: false,
+            stargazers_count: 0,
+            forks_count: 0,
+            updated_at: "",
+            html_url: "",
           }),
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mockUrlFetch.mockReturnValue(mockResponse as any);
+      mockUrlFetch
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockReturnValueOnce(mockIssueResponse as any)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .mockReturnValueOnce(mockRepoResponse as any);
 
       const result = client.fetchIssue("test", "repo", 123);
 

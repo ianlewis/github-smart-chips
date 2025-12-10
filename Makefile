@@ -135,9 +135,10 @@ node_modules/.installed: package-lock.json
 	@# bash \
 	python -m venv .venv
 
-.venv/.installed: requirements-dev.txt .venv/bin/activate
+.venv/.installed: requirements.txt requirements-dev.txt .venv/bin/activate
 	@# bash \
 	$(REPO_ROOT)/.venv/bin/pip install -r $< --require-hashes; \
+	$(REPO_ROOT)/.venv/bin/pip install -r $(word 2,$^) --require-hashes; \
 	touch $@
 
 .bin/aqua-$(AQUA_VERSION)/aqua:
@@ -199,6 +200,19 @@ unit-test: node_modules/.installed ## Runs all unit tests.
 	NODE_OPTIONS=--experimental-vm-modules \
 	NODE_NO_WARNINGS=1 \
 		$(REPO_ROOT)/node_modules/.bin/jest --coverage
+
+## GitHub Pages
+#####################################################################
+
+.PHONY: mkdocs
+mkdocs: .venv/.installed ## Build MkDocs site.
+	@# bash \
+	$(REPO_ROOT)/.venv/bin/mkdocs build --clean
+
+.PHONY: serve
+serve: mkdocs ## Serve the website locally.
+	@# bash \
+	$(REPO_ROOT)/.venv/bin/python3 -m http.server --directory _site/
 
 ## Formatting
 #####################################################################
@@ -542,66 +556,15 @@ format-check: ## Check that files are properly formatted.
 .PHONY: markdownlint
 markdownlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the markdownlint linter.
 	@# bash \
-	# NOTE: Issue and PR templates are handled specially so we can disable \
-	# MD041/first-line-heading/first-line-h1 without adding an ugly html comment \
-	# at the top of the file. \
 	files=$$( \
 		git ls-files --deduplicate \
 			'*.md' \
-			':!:.github/pull_request_template.md' \
-			':!:.github/ISSUE_TEMPLATE/*.md' \
 			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
 	); \
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
 	fi; \
-	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		exit_code=0; \
-		while IFS="" read -r p && [ -n "$$p" ]; do \
-			file=$$(echo "$$p" | jq -cr '.fileName // empty'); \
-			line=$$(echo "$$p" | jq -cr '.lineNumber // empty'); \
-			endline=$${line}; \
-			message=$$(echo "$$p" | jq -cr '.ruleNames[0] + "/" + .ruleNames[1] + " " + .ruleDescription + " [Detail: \"" + .errorDetail + "\", Context: \"" + .errorContext + "\"]"'); \
-			exit_code=1; \
-			echo "::error file=$${file},line=$${line},endLine=$${endline}::$${message}"; \
-		done <<< "$$($(REPO_ROOT)/node_modules/.bin/markdownlint --config .markdownlint.yaml --dot --json $${files} 2>&1 | jq -c '.[]')"; \
-		if [ "$${exit_code}" != "0" ]; then \
-			exit "$${exit_code}"; \
-		fi; \
-	else \
-		$(REPO_ROOT)/node_modules/.bin/markdownlint \
-			--config .markdownlint.yaml \
-			--dot \
-			$${files}; \
-	fi; \
-	files=$$( \
-		git ls-files --deduplicate \
-			'.github/pull_request_template.md' \
-			'.github/ISSUE_TEMPLATE/*.md' \
-			| while IFS='' read -r f; do [ -f "$${f}" ] && echo "$${f}" || true; done \
-	); \
-	if [ "$${files}" == "" ]; then \
-		exit 0; \
-	fi; \
-	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		exit_code=0; \
-		while IFS="" read -r p && [ -n "$$p" ]; do \
-			file=$$(echo "$$p" | jq -cr '.fileName // empty'); \
-			line=$$(echo "$$p" | jq -cr '.lineNumber // empty'); \
-			endline=$${line}; \
-			message=$$(echo "$$p" | jq -cr '.ruleNames[0] + "/" + .ruleNames[1] + " " + .ruleDescription + " [Detail: \"" + .errorDetail + "\", Context: \"" + .errorContext + "\"]"'); \
-			exit_code=1; \
-			echo "::error file=$${file},line=$${line},endLine=$${endline}::$${message}"; \
-		done <<< "$$($(REPO_ROOT)/node_modules/.bin/markdownlint --config .github/template.markdownlint.yaml --dot --json $${files} 2>&1 | jq -c '.[]')"; \
-		if [ "$${exit_code}" != "0" ]; then \
-			exit "$${exit_code}"; \
-		fi; \
-	else \
-		$(REPO_ROOT)/node_modules/.bin/markdownlint \
-			--config .github/template.markdownlint.yaml \
-			--dot \
-			$${files}; \
-	fi
+	$(REPO_ROOT)/node_modules/.bin/markdownlint-cli2 $${files}
 
 .PHONY: renovate-config-validator
 renovate-config-validator: node_modules/.installed ## Validate Renovate configuration.

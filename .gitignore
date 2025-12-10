@@ -113,3 +113,6 @@ Thumbs.db
 __tests__/runner/*
 lib/
 dist/
+
+# Static site output
+_site/
