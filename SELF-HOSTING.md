@@ -50,22 +50,18 @@ account.
 ### 4. Configure Script ID
 
 Update the `.clasp.json` file in the project root with your Apps Script
-project's Script ID. The file looks like this:
+project's Script ID:
 
 ```json
 {
-    "scriptId": "YOUR_SCRIPT_ID_HERE",
-    "rootDir": "",
-    "scriptExtensions": [".js", ".gs"],
-    "htmlExtensions": [".html"],
-    "jsonExtensions": [".json"],
-    "filePushOrder": [],
-    "skipSubdirectories": false
+    "scriptId": "YOUR_SCRIPT_ID_HERE"
 }
 ```
 
-Replace `YOUR_SCRIPT_ID_HERE` with your actual Script ID from step 2. Leave the
-other properties as they are.
+Replace `YOUR_SCRIPT_ID_HERE` with your actual Script ID from step 2.
+
+The file may contain additional properties like `rootDir`, `scriptExtensions`,
+etc. - leave those as they are and only update the `scriptId`.
 
 **Note**: The build process automatically copies this file to the `dist/`
 directory where clasp uses it for deployment.
