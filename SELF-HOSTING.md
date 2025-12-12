@@ -299,14 +299,16 @@ For a production deployment that doesn't require test mode:
 To create a new production deployment:
 
 ```bash
-# Set a version name/tag for the deployment
+# Option 1: Set environment variable then run make
 export GITHUB_REF_NAME="v1.0.0"
-
-# Create a new deployment
 make create-deployment
+
+# Option 2: Set environment variable inline
+GITHUB_REF_NAME="v1.0.0" make create-deployment
 ```
 
-The deployment will be created with the description from `GITHUB_REF_NAME`.
+The deployment will be created with the description from the `GITHUB_REF_NAME`
+environment variable (e.g., "v1.0.0").
 
 ## Additional Resources
 
