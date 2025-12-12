@@ -17,7 +17,6 @@ name: deploy
 on:
   release:
     types: [created]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -51,10 +50,10 @@ jobs:
         env:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
-      - name: Deploy to Apps Script
+      - name: Create Apps Script Deployment
         run: |
-          # Build TypeScript, package distribution, and deploy to Apps Script
-          make deploy
+          # Create a new deployment in Apps Script
+          make create-deployment
 
       - name: Clean up credentials
         if: always()

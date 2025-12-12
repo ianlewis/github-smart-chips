@@ -179,13 +179,28 @@ pack: build ## Builds the distribution.
 	$(REPO_ROOT)/node_modules/.bin/rollup \
 		--config rollup.config.ts
 
-.PHONY: deploy
-deploy: pack ## Deploy the project.
+.PHONY: push
+push: pack ## Push the latest code to Apps Script.
 	@# bash \
 	( \
 		cd $(REPO_ROOT)/dist; \
 		$(REPO_ROOT)/node_modules/.bin/clasp push --force; \
 	)
+
+.PHONY: create-deployment
+create-deployment: push ## Create a new Apps Script deployment.
+	@# bash \
+	( \
+		if [ -z "$${GITHUB_REF_NAME:-}" ]; then \
+			>&2 echo "GITHUB_REF_NAME is not set. Cannot create deployment."; \
+			exit 1; \
+		fi; \
+		cd $(REPO_ROOT)/dist; \
+		$(REPO_ROOT)/node_modules/.bin/clasp create-deployment \
+			--description "$${GITHUB_REF_NAME}" ; \
+	)
+
+
 
 ## Testing
 #####################################################################
