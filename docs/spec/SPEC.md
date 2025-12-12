@@ -86,6 +86,7 @@ The following GitHub links will be supported:
 - Repository links (e.g., `https://github.com/owner/repo`)
 - Issue links (e.g., `https://github.com/owner/repo/issues/123`)
 - Pull Request links (e.g., `https://github.com/owner/repo/pull/123`)
+- User profile links (e.g., `https://github.com/username`)
 
 ### User Interface (UI)
 
@@ -121,6 +122,9 @@ All chips will include a GitHub Octocat icon.
 - **Pull Request Link Smart Chip**: The smart chip will display the repository
   name (owner/repo), PR title, and number.
   e.g. `octocat/Hello-World#123: feat: Fix bug in code`
+- **User Profile Link Smart Chip**: The smart chip will display the user's
+  username and name in the format `username (name)`.
+  e.g. `ianlewis (Ian Lewis)`
 
 #### Card Details
 
@@ -189,6 +193,23 @@ Each link type will have specific details displayed in the preview card:
     - A snippet of the pull request body/description (first 50 characters).
     - The branches involved in the pull request (BASE <- HEAD).
 
+- **User Profile Preview Card**: The preview card will display a card with user
+  profile information that resembles GitHub's own user profile overview.
+
+    The card will include the following information:
+    - The user's full name (or username if name is not available) with a link
+      to the user's profile.
+    - The user's avatar image.
+    - The user's bio/description.
+    - Username (with @ prefix).
+    - Location (if available).
+    - Company (if available).
+    - Number of public repositories.
+    - Follower and following counts.
+    - Website/blog URL (if available).
+    - Account creation date (displayed as relative time, e.g. "Joined 5 years
+      ago").
+
 ### GitHub API Client
 
 The GitHub API client will be responsible for making authenticated requests
@@ -199,6 +220,7 @@ functions to:
 - Fetch repository details.
 - Fetch issue details.
 - Fetch pull request details.
+- Fetch user profile details.
 
 The client should be designed as a reusable class (`GitHubAPIClient`) in a
 JavaScript module. The class constructor should take an OAuth2 access token as a
@@ -211,6 +233,7 @@ objects returned by GitHub.
 - [Get a repository](https://docs.github.com/en/rest/repos/repos?apiVersion=2022-11-28#get-a-repository)
 - [Get an issue](https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#get-an-issue)
 - [Get a pull request](https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request)
+- [Get a user](https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-a-user)
 
 When the API returns errors, they should be returned to the caller so that it
 can handle them appropriately (e.g., displaying an authentication or error

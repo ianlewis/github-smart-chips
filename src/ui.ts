@@ -16,6 +16,7 @@ import {
   type GitHubRepository,
   type GitHubIssue,
   type GitHubPullRequest,
+  type GitHubUser,
 } from "./types.js";
 
 import { relativeTime, trimString } from "./utils.js";
@@ -242,6 +243,110 @@ export function createRepositoryCard(
     CardService.newCardSection().addWidget(
       CardService.newTextButton()
         .setText("View Repository on GitHub")
+        .setOpenLink(CardService.newOpenLink().setUrl(data.html_url)),
+    ),
+  );
+
+  return cardBuilder.build();
+}
+
+/**
+ * Create a preview card for a GitHub user profile
+ */
+export function createUserCard(
+  data: GitHubUser,
+): GoogleAppsScript.Card_Service.Card {
+  const subtitle = data.bio || "GitHub User";
+  const title = data.name ? `${data.login} (${data.name})` : data.login;
+
+  const cardBuilder = CardService.newCardBuilder().setHeader(
+    CardService.newCardHeader()
+      .setTitle(title)
+      .setSubtitle(subtitle)
+      .setImageUrl(data.avatar_url || GITHUB_LOGO),
+  );
+
+  // Add username and location
+  const infoSection = CardService.newCardSection();
+
+  infoSection.addWidget(
+    CardService.newKeyValue()
+      .setTopLabel("Username")
+      .setContent(`@${data.login}`),
+  );
+
+  if (data.location) {
+    infoSection.addWidget(
+      CardService.newKeyValue()
+        .setTopLabel("Location")
+        .setContent(data.location),
+    );
+  }
+
+  if (data.company) {
+    infoSection.addWidget(
+      CardService.newKeyValue().setTopLabel("Company").setContent(data.company),
+    );
+  }
+
+  cardBuilder.addSection(infoSection);
+
+  // Add stats section
+  if (
+    data.public_repos !== undefined ||
+    data.followers !== undefined ||
+    data.following !== undefined
+  ) {
+    const statsSection = CardService.newCardSection();
+
+    if (data.public_repos !== undefined) {
+      statsSection.addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Public Repositories")
+          .setContent(data.public_repos.toString()),
+      );
+    }
+
+    if (data.followers !== undefined && data.following !== undefined) {
+      statsSection.addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Followers / Following")
+          .setContent(`${data.followers} / ${data.following}`),
+      );
+    }
+
+    cardBuilder.addSection(statsSection);
+  }
+
+  // Add blog link if available
+  if (data.blog) {
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue().setTopLabel("Website").setContent(data.blog),
+      ),
+    );
+  }
+
+  // Add account creation date if available
+  if (data.created_at) {
+    const createdDate = new Date(data.created_at);
+    const now = new Date();
+    const joinedText = `Joined ${relativeTime(now, createdDate)}`;
+
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Member Since")
+          .setContent(joinedText),
+      ),
+    );
+  }
+
+  // Add action button to view on GitHub
+  cardBuilder.addSection(
+    CardService.newCardSection().addWidget(
+      CardService.newTextButton()
+        .setText("View Profile on GitHub")
         .setOpenLink(CardService.newOpenLink().setUrl(data.html_url)),
     ),
   );

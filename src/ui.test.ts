@@ -17,11 +17,13 @@ import {
   createIssueCard,
   createPullRequestCard,
   createRepositoryCard,
+  createUserCard,
 } from "./ui.js";
 import {
   type GitHubRepository,
   type GitHubIssue,
   type GitHubPullRequest,
+  type GitHubUser,
 } from "./types.js";
 import { GITHUB_LOGO } from "./logos.js";
 
@@ -475,5 +477,81 @@ describe("createRepositoryCard", () => {
 
     expect(CardService.newCardBuilder).toHaveBeenCalled();
     expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+});
+
+describe("createUserCard", () => {
+  it("should create a card for a user with full profile information", () => {
+    const data: GitHubUser = {
+      login: "ianlewis",
+      avatar_url: "https://avatars.githubusercontent.com/u/123456",
+      html_url: "https://github.com/ianlewis",
+      name: "Ian Lewis",
+      bio: "Software Engineer",
+      company: "Example Corp",
+      location: "San Francisco, CA",
+      blog: "https://example.com",
+      public_repos: 50,
+      followers: 100,
+      following: 75,
+      created_at: "2010-01-01T00:00:00Z",
+    };
+
+    createUserCard(data);
+
+    expect(CardService.newCardBuilder).toHaveBeenCalled();
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
+      "ianlewis (Ian Lewis)",
+    );
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
+      "Software Engineer",
+    );
+    expect(mockCardHeader.setImageUrl).toHaveBeenCalledWith(
+      "https://avatars.githubusercontent.com/u/123456",
+    );
+    expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+
+  it("should create a card for a user with minimal information", () => {
+    const data: GitHubUser = {
+      login: "testuser",
+      avatar_url: "https://avatars.githubusercontent.com/u/789",
+      html_url: "https://github.com/testuser",
+    };
+
+    createUserCard(data);
+
+    expect(CardService.newCardBuilder).toHaveBeenCalled();
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("testuser");
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith("GitHub User");
+    expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+
+  it("should handle user with no avatar", () => {
+    const data: GitHubUser = {
+      login: "noavatar",
+      avatar_url: "",
+      html_url: "https://github.com/noavatar",
+      name: "No Avatar User",
+    };
+
+    createUserCard(data);
+
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
+      "noavatar (No Avatar User)",
+    );
+    expect(mockCardHeader.setImageUrl).toHaveBeenCalledWith(GITHUB_LOGO);
+  });
+
+  it("should handle user with no name", () => {
+    const data: GitHubUser = {
+      login: "username",
+      avatar_url: "https://avatars.githubusercontent.com/u/123",
+      html_url: "https://github.com/username",
+    };
+
+    createUserCard(data);
+
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("username");
   });
 });

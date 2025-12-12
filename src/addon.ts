@@ -18,6 +18,7 @@ import {
   createRepositoryCard,
   createIssueCard,
   createPullRequestCard,
+  createUserCard,
 } from "./ui.js";
 import { GITHUB_LOGO } from "./logos.js";
 
@@ -52,15 +53,17 @@ export function onLinkPreview(
   let card: GoogleAppsScript.Card_Service.Card | null = null;
   switch (urlInfo.type) {
     case "repository": {
-      const repo = client.fetchRepository(urlInfo.owner, urlInfo.repo);
-      if (!repo) {
-        break;
+      if (urlInfo.repo) {
+        const repo = client.fetchRepository(urlInfo.owner, urlInfo.repo);
+        if (!repo) {
+          break;
+        }
+        card = createRepositoryCard(repo);
       }
-      card = createRepositoryCard(repo);
       break;
     }
     case "issue": {
-      if (urlInfo.number) {
+      if (urlInfo.number && urlInfo.repo) {
         const issue = client.fetchIssue(
           urlInfo.owner,
           urlInfo.repo,
@@ -74,7 +77,7 @@ export function onLinkPreview(
       break;
     }
     case "pull_request": {
-      if (urlInfo.number) {
+      if (urlInfo.number && urlInfo.repo) {
         const pull = client.fetchPullRequest(
           urlInfo.owner,
           urlInfo.repo,
@@ -85,6 +88,14 @@ export function onLinkPreview(
         }
         card = createPullRequestCard(pull);
       }
+      break;
+    }
+    case "user": {
+      const user = client.fetchUser(urlInfo.owner);
+      if (!user) {
+        break;
+      }
+      card = createUserCard(user);
       break;
     }
   }

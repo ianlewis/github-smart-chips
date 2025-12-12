@@ -19,6 +19,15 @@ export interface GitHubUser {
   login: string;
   avatar_url: string;
   html_url: string;
+  name?: string;
+  bio?: string;
+  company?: string;
+  location?: string;
+  blog?: string;
+  public_repos?: number;
+  followers?: number;
+  following?: number;
+  created_at?: string;
 }
 
 /**
@@ -87,7 +96,7 @@ export interface GitHubRepository {
  */
 export interface GitHubURLInfo {
   owner: string;
-  repo: string;
+  repo?: string;
   number?: number;
-  type: "repository" | "issue" | "pull_request";
+  type: "repository" | "issue" | "pull_request" | "user";
 }

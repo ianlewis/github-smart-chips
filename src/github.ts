@@ -16,6 +16,7 @@ import {
   type GitHubRepository,
   type GitHubIssue,
   type GitHubPullRequest,
+  type GitHubUser,
   type GitHubURLInfo,
 } from "./types.js";
 
@@ -27,6 +28,7 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
   const pullPattern = /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
   const repoPattern =
     /github\.com\/([^/]+)\/([^/]+)(\/(tree|blob)\/([^/]+)\/?|\/?$)/;
+  const userPattern = /github\.com\/([^/]+)\/?$/;
 
   let match = url.match(pullPattern);
   if (match) {
@@ -54,6 +56,14 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
       owner: match[1],
       repo: match[2],
       type: "repository",
+    };
+  }
+
+  match = url.match(userPattern);
+  if (match) {
+    return {
+      owner: match[1],
+      type: "user",
     };
   }
 
@@ -172,6 +182,34 @@ export class GitHubAPIClient {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error fetching GitHub pull request data: ${error}`);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch user details
+   */
+  fetchUser(username: string): GitHubUser | null {
+    const apiUrl = `https://api.github.com/users/${username}`;
+
+    try {
+      const response = UrlFetchApp.fetch(apiUrl, {
+        headers: this.headers(),
+        muteHttpExceptions: true,
+      });
+
+      if (response.getResponseCode() !== 200) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
+        );
+        return null;
+      }
+
+      return JSON.parse(response.getContentText()) as GitHubUser;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching GitHub user data: ${error}`);
       return null;
     }
   }

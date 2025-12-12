@@ -136,6 +136,36 @@ describe("parseGitHubURL", () => {
 
     expect(result).toBeNull();
   });
+
+  it("should parse GitHub user profile URLs", () => {
+    const url = "https://github.com/ianlewis";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("ianlewis");
+    expect(result?.repo).toBeUndefined();
+    expect(result?.type).toBe("user");
+  });
+
+  it("should parse GitHub user profile URLs with trailing slash", () => {
+    const url = "https://github.com/ianlewis/";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("ianlewis");
+    expect(result?.repo).toBeUndefined();
+    expect(result?.type).toBe("user");
+  });
+
+  it("should prioritize repository URLs over user URLs", () => {
+    const url = "https://github.com/owner/repo";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.type).toBe("repository");
+    expect(result?.owner).toBe("owner");
+    expect(result?.repo).toBe("repo");
+  });
 });
 
 describe("GitHubAPIClient", () => {
@@ -431,6 +461,84 @@ describe("GitHubAPIClient", () => {
       mockUrlFetch.mockReturnValue(mockResponse as any);
 
       const result = client.fetchPullRequest("test", "repo", 456);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("fetchUser", () => {
+    it("should fetch user data successfully", () => {
+      const mockResponse = {
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            login: "ianlewis",
+            avatar_url: "https://avatars.githubusercontent.com/u/123456",
+            html_url: "https://github.com/ianlewis",
+            name: "Ian Lewis",
+            bio: "Software Engineer",
+            company: "Example Corp",
+            location: "San Francisco, CA",
+            blog: "https://example.com",
+            public_repos: 50,
+            followers: 100,
+            following: 75,
+            created_at: "2010-01-01T00:00:00Z",
+          }),
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchUser("ianlewis");
+
+      expect(result).toEqual({
+        login: "ianlewis",
+        avatar_url: "https://avatars.githubusercontent.com/u/123456",
+        html_url: "https://github.com/ianlewis",
+        name: "Ian Lewis",
+        bio: "Software Engineer",
+        company: "Example Corp",
+        location: "San Francisco, CA",
+        blog: "https://example.com",
+        public_repos: 50,
+        followers: 100,
+        following: 75,
+        created_at: "2010-01-01T00:00:00Z",
+      });
+
+      expect(mockUrlFetch).toHaveBeenCalledWith(
+        "https://api.github.com/users/ianlewis",
+        {
+          headers: {
+            Accept: "application/vnd.github.v3+json",
+            Authorization: "Bearer test-token",
+          },
+          muteHttpExceptions: true,
+        },
+      );
+    });
+
+    it("should return null when API returns error", () => {
+      const mockResponse = {
+        getResponseCode: () => 404,
+        getContentText: () => "Not Found",
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchUser("nonexistentuser");
+
+      expect(result).toBeNull();
+    });
+
+    it("should handle API fetch exceptions", () => {
+      mockUrlFetch.mockImplementation(() => {
+        throw new Error("Network error");
+      });
+
+      const result = client.fetchUser("ianlewis");
 
       expect(result).toBeNull();
     });
