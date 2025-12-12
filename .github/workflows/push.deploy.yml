@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: deploy to production
+name: deploy to testing
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,7 +28,7 @@ concurrency:
 
 jobs:
   deploy:
-    environment: production
+    environment: testing
     name: deploy
     runs-on: ubuntu-latest
     steps:
@@ -51,10 +52,8 @@ jobs:
         env:
           CLASP_CREDENTIALS: ${{ secrets.CLASP_CREDENTIALS }}
 
-      - name: Create Apps Script Deployment
-        run: |
-          # Create a new deployment in Apps Script
-          make create-deployment
+      - name: Push to Testing
+        run: make push
 
       - name: Clean up credentials
         if: always()
