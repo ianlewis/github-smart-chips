@@ -20,9 +20,6 @@ to your own Google Apps Script project, including all necessary configuration.
 git clone https://github.com/ianlewis/github-smart-chips.git
 cd github-smart-chips
 
-# Install dependencies
-npm install
-
 # Build and package the project
 make pack
 ```
@@ -38,30 +35,22 @@ deployment.
 4. Click the gear icon (Project Settings) and note your **Script ID** - you'll
    need this for authentication setup
 
-### 3. Set Up Clasp (Google's Apps Script CLI)
+### 3. Authenticate with Google Apps Script
+
+Authenticate with your Google account to enable deployment:
 
 ```bash
-# Install clasp globally
-npm install -g @google/clasp
-
 # Login to your Google account
-clasp login
+make clasp-login
 ```
 
-Now create a `.clasp.json` file in the `dist/` directory to link it to your
-Apps Script project:
+This will open a browser window for you to authorize access to your Google
+account.
 
-```bash
-# From the project root directory
-cd dist
+### 4. Configure Script ID
 
-# Create .clasp.json with your Script ID
-# Replace <SCRIPT_ID> with your actual Script ID from step 2
-echo '{"scriptId":"<SCRIPT_ID>"}' > .clasp.json
-```
-
-Alternatively, you can manually create a `dist/.clasp.json` file with the
-following content:
+Update the `.clasp.json` file in the project root with your Apps Script
+project's Script ID:
 
 ```json
 {
@@ -69,7 +58,9 @@ following content:
 }
 ```
 
-### 4. Create GitHub OAuth App
+Replace `YOUR_SCRIPT_ID_HERE` with your actual Script ID from step 2.
+
+### 5. Create GitHub OAuth App
 
 The add-on requires a GitHub OAuth App to authenticate users and access
 repository data.
@@ -105,7 +96,7 @@ The add-on requests the `repo` scope from GitHub, which is required to:
 
 Users will be prompted to authorize this scope when they first use the add-on.
 
-### 5. Configure Script Properties
+### 6. Configure Script Properties
 
 Script properties are used to securely store your GitHub OAuth credentials in
 Apps Script.
@@ -121,7 +112,7 @@ Apps Script.
 **Important**: Property names are case-sensitive and must be exactly
 `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
 
-### 6. Deploy to Apps Script
+### 7. Deploy to Apps Script
 
 ```bash
 # From the project root directory
@@ -130,7 +121,7 @@ make push
 
 This command builds and pushes your code to Google Apps Script.
 
-### 7. Create a Test Deployment
+### 8. Create a Test Deployment
 
 1. In your Apps Script project, click **"Deploy"** > **"Test deployments"**
 2. Click **"Install"**
@@ -162,9 +153,6 @@ When you want to update your deployment with the latest code:
 ```bash
 # Pull the latest changes (if using git)
 git pull origin main
-
-# Install any new dependencies
-npm install
 
 # Build and deploy
 make push
@@ -305,16 +293,17 @@ For a production deployment that doesn't require test mode:
 4. Click **"Deploy"**
 5. Note the **Deployment ID** for future updates
 
-To update a production deployment:
+To create a new production deployment:
 
 ```bash
-# Build and push code
-make push
+# Set a version name/tag for the deployment
+export GITHUB_REF_NAME="v1.0.0"
 
-# In Apps Script, go to Deploy > Manage deployments
-# Click the pencil icon on your deployment
-# Click "Deploy" to create a new version
+# Create a new deployment
+make create-deployment
 ```
+
+The deployment will be created with the description from `GITHUB_REF_NAME`.
 
 ## Additional Resources
 

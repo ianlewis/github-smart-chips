@@ -179,6 +179,11 @@ pack: build ## Builds the distribution.
 	$(REPO_ROOT)/node_modules/.bin/rollup \
 		--config rollup.config.ts
 
+.PHONY: clasp-login
+clasp-login: node_modules/.installed ## Authenticate with Google Apps Script via clasp.
+	@# bash \
+	$(REPO_ROOT)/node_modules/.bin/clasp login
+
 .PHONY: push
 push: pack ## Push the latest code to Apps Script.
 	@# bash \
