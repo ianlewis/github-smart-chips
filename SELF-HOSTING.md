@@ -248,9 +248,9 @@ make push
 
 **Solution**:
 
-- Run `clasp login` again to refresh credentials
+- Run `make clasp-login` again to refresh credentials
 - Verify you have edit access to the Apps Script project
-- Check that the Script ID in `dist/.clasp.json` is correct
+- Check that the Script ID in `.clasp.json` is correct
 
 ## Security Best Practices
 
