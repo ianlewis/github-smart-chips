@@ -500,7 +500,9 @@ describe("createUserCard", () => {
     createUserCard(data);
 
     expect(CardService.newCardBuilder).toHaveBeenCalled();
-    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("Ian Lewis");
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
+      "ianlewis (Ian Lewis)",
+    );
     expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
       "Software Engineer",
     );
@@ -535,6 +537,9 @@ describe("createUserCard", () => {
 
     createUserCard(data);
 
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
+      "noavatar (No Avatar User)",
+    );
     expect(mockCardHeader.setImageUrl).toHaveBeenCalledWith(GITHUB_LOGO);
   });
 

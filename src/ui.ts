@@ -257,10 +257,11 @@ export function createUserCard(
   data: GitHubUser,
 ): GoogleAppsScript.Card_Service.Card {
   const subtitle = data.bio || "GitHub User";
+  const title = data.name ? `${data.login} (${data.name})` : data.login;
 
   const cardBuilder = CardService.newCardBuilder().setHeader(
     CardService.newCardHeader()
-      .setTitle(data.name || data.login)
+      .setTitle(title)
       .setSubtitle(subtitle)
       .setImageUrl(data.avatar_url || GITHUB_LOGO),
   );

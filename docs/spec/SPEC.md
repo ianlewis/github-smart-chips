@@ -122,9 +122,9 @@ All chips will include a GitHub Octocat icon.
 - **Pull Request Link Smart Chip**: The smart chip will display the repository
   name (owner/repo), PR title, and number.
   e.g. `octocat/Hello-World#123: feat: Fix bug in code`
-- **User Profile Link Smart Chip**: The smart chip will display the user's name
-  or username.
-  e.g. `Ian Lewis` or `@ianlewis`
+- **User Profile Link Smart Chip**: The smart chip will display the user's
+  username and name in the format `username (name)`.
+  e.g. `ianlewis (Ian Lewis)`
 
 #### Card Details
 
