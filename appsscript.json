@@ -23,7 +23,7 @@
   "addOns": {
     "common": {
       "name": "GitHub Smart Chips",
-      "logoUrl": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+      "logoUrl": "https://ianlewis.github.io/github-smart-chips/logo.png",
       "layoutProperties": {
         "primaryColor": "#24292e",
         "secondaryColor": "#586069"
