@@ -25,6 +25,12 @@ rules:
       - "/\\bCommonJS\\b/" # JavaScript module system
       - "/\\bRollup\\.js\\b/" # JavaScript module bundler
 
+      - "/\\b[Ll]icensors?\\b/"
+      - "/\\b[Mm]erchantability\\b/"
+      - "/\\b[Tt]rojan\\b/"
+      - "/\\b[Tt]imebombs?\\b/"
+      - "/\\b[Ss]everability\\b/"
+
       - "/\\bCodecov\\b/" # Code coverage service
       - "/\\bESM\\b/" # ECMAScript Modules
 

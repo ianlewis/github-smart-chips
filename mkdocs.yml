@@ -1,0 +1,38 @@
+# Copyright 2025 Ian Lewis
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+site_name: GitHub Smart Chips
+site_url: https://ianlewis.github.io/github-smart-chips/
+repo_url: https://github.com/ianlewis/github-smart-chips
+docs_dir: web
+site_dir: _site
+
+theme:
+  name: landing
+
+  header_layout:
+    - avatar
+    - title
+    - tagline
+    - socials
+  avatar_size: 15rem
+  tagline: "Smart Chip Preview Links for Google Workspace."
+  avatar: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+
+  socials:
+    - label: GitHub
+      link: https://github.com/ianlewis/github-smart-chips
+      icon: [brands, github]
+
+  share_btn: false
