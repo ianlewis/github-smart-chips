@@ -50,15 +50,22 @@ account.
 ### 4. Configure Script ID
 
 Update the `.clasp.json` file in the project root with your Apps Script
-project's Script ID:
+project's Script ID. The file looks like this:
 
 ```json
 {
-    "scriptId": "YOUR_SCRIPT_ID_HERE"
+    "scriptId": "YOUR_SCRIPT_ID_HERE",
+    "rootDir": "",
+    "scriptExtensions": [".js", ".gs"],
+    "htmlExtensions": [".html"],
+    "jsonExtensions": [".json"],
+    "filePushOrder": [],
+    "skipSubdirectories": false
 }
 ```
 
-Replace `YOUR_SCRIPT_ID_HERE` with your actual Script ID from step 2.
+Replace `YOUR_SCRIPT_ID_HERE` with your actual Script ID from step 2. Leave the
+other properties as they are.
 
 **Note**: The build process automatically copies this file to the `dist/`
 directory where clasp uses it for deployment.
@@ -242,7 +249,7 @@ make push
 **Solution**:
 
 - Ensure you're using the correct Node.js version (check `.node-version`)
-- Delete `node_modules` and run `npm install` again
+- Delete `node_modules` and run `make pack` to reinstall dependencies and rebuild
 - Check that all prerequisites are installed
 
 ### Permission Errors
