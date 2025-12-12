@@ -1,195 +1,207 @@
-# Deployment Guide
+# Self-Hosting Deployment Guide
 
-This guide explains how to deploy the GitHub Smart Chips add-on to Google Apps
-Script.
+This guide explains how to self-host and deploy the GitHub Smart Chips add-on
+to your own Google Apps Script project.
 
 ## Prerequisites
 
-1. A Google account
-2. A GitHub OAuth App (for authentication)
-3. Node.js and npm installed locally
+- A Google account
+- Node.js (see `.node-version` file for required version)
+- npm (comes with Node.js)
+- Make (for build automation)
+- A GitHub account (to create an OAuth App)
 
-## Build the Project
+## Quick Start
+
+### 1. Clone and Build
 
 ```bash
+# Clone the repository
+git clone https://github.com/ianlewis/github-smart-chips.git
+cd github-smart-chips
+
 # Install dependencies
 npm install
 
-# Build the TypeScript code
-npm run build
-# or
-make build
+# Build and package the project
+make pack
 ```
 
-This will generate JavaScript files in the `lib/` directory.
+This creates a `dist/` directory containing the compiled add-on code ready for
+deployment.
 
-## Create Apps Script Project
+### 2. Create Apps Script Project
 
 1. Go to <https://script.google.com/>
-2. Click "New Project"
-3. Give your project a name (e.g., "GitHub Smart Chips")
-4. Note the **Script ID** from the project settings (gear icon) - you'll need
-   this for the GitHub OAuth App callback URL
+2. Click **"New Project"**
+3. Give your project a name (e.g., "My GitHub Smart Chips")
+4. Click the gear icon (Project Settings) and note your **Script ID** - you'll
+   need this for authentication setup
 
-## Setup GitHub OAuth App
-
-1. Go to <https://github.com/settings/developers>
-2. Click "New OAuth App"
-3. Fill in the application details:
-    - **Application name**: GitHub Smart Chips
-    - **Homepage URL**: Your app's homepage (can be a GitHub repo)
-    - **Authorization callback URL**:
-      `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback` (replace
-      `{SCRIPT_ID}` with your Apps Script project's Script ID from the previous
-      step)
-4. Click "Register application"
-5. Note down the **Client ID**
-6. Generate a new **Client Secret** and save it securely
-
-## Upload Files
-
-Use `clasp` to deploy the code to Google Apps Script.
+### 3. Set Up Clasp (Google's Apps Script CLI)
 
 ```bash
-# Install clasp
+# Install clasp globally
 npm install -g @google/clasp
 
-# Login to Google
+# Login to your Google account
 clasp login
 
-# Create or clone your project
-clasp create --type docs --title "GitHub Smart Chips"
-# or
+# Link your Apps Script project
+# Replace <SCRIPT_ID> with your Script ID from step 2
+cd dist
 clasp clone <SCRIPT_ID>
-
-# Copy files to the project directory
-cp lib/*.js <clasp-project-directory>/
-cp appsscript.json <clasp-project-directory>/
-
-# Push to Apps Script
-cd <clasp-project-directory>
-clasp push
 ```
 
-## Configure Script Properties
+This creates a `.clasp.json` file in the `dist/` directory linking it to your
+Apps Script project.
 
-1. In Apps Script, go to Project Settings (gear icon)
-2. Scroll to "Script Properties"
-3. Add the following properties:
-    - **GITHUB_CLIENT_ID**: Your GitHub OAuth App Client ID
-    - **GITHUB_CLIENT_SECRET**: Your GitHub OAuth App Client Secret
+### 4. Create GitHub OAuth App
 
-## Deploy as Add-on
+1. Go to <https://github.com/settings/developers>
+2. Click **"New OAuth App"**
+3. Fill in:
+    - **Application name**: `GitHub Smart Chips` (or your preferred name)
+    - **Homepage URL**: `https://github.com/ianlewis/github-smart-chips` (or
+      your fork)
+    - **Authorization callback URL**:
+      `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
+        - Replace `{SCRIPT_ID}` with your actual Script ID from step 2
+4. Click **"Register application"**
+5. Copy the **Client ID**
+6. Click **"Generate a new client secret"** and copy the **Client Secret**
+   immediately (it won't be shown again)
 
-### Test Deployment
+### 5. Configure Script Properties
 
-1. In Apps Script, click "Deploy" > "Test deployments"
-2. Select "Install"
-3. Grant the necessary permissions
+1. In your Apps Script project, click the gear icon (Project Settings)
+2. Scroll to **"Script Properties"**
+3. Click **"Add script property"** and add both:
+    - Property: `GITHUB_CLIENT_ID`, Value: Your GitHub OAuth App Client ID
+    - Property: `GITHUB_CLIENT_SECRET`, Value: Your GitHub OAuth App Client
+      Secret
+4. Click **"Save script properties"**
+
+### 6. Deploy to Apps Script
+
+```bash
+# From the project root directory
+make push
+```
+
+This command builds and pushes your code to Google Apps Script.
+
+### 7. Create a Test Deployment
+
+1. In your Apps Script project, click **"Deploy"** > **"Test deployments"**
+2. Click **"Install"**
+3. Grant the necessary permissions when prompted
 4. Open a Google Doc to test the add-on
 
-### Production Deployment
+## Using the Add-on
 
-1. Click "Deploy" > "New deployment"
-2. Select type: "Add-on"
-3. Configure the deployment settings
-4. Click "Deploy"
-
-## Testing
-
-1. Open a Google Doc
-2. The add-on should appear in the Add-ons menu
-3. Paste a GitHub issue or PR URL (e.g.,
+1. Open or create a Google Doc
+2. Paste a GitHub issue or PR URL (e.g.,
    `https://github.com/owner/repo/issues/123`)
-4. You should see a smart chip with the issue/PR information
+3. The URL will automatically convert to a smart chip showing the issue/PR
+   details
+
+## Updating Your Deployment
+
+When you want to update your deployment with the latest code:
+
+```bash
+# Pull the latest changes (if using git)
+git pull origin main
+
+# Install any new dependencies
+npm install
+
+# Build and deploy
+make push
+```
 
 ## Troubleshooting
 
 ### Authentication Issues
 
-- Ensure the GitHub OAuth App callback URL matches the Apps Script callback URL
-  format: `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
-- Check that script properties are set correctly
-- Verify that the OAuth2 library is properly configured in `appsscript.json`
+**Problem**: OAuth authentication fails or redirects to the wrong URL.
+
+**Solution**:
+
+- Verify the callback URL in your GitHub OAuth App exactly matches:
+  `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
+- Ensure `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` are set correctly in
+  Script Properties
+- Check for extra spaces or newlines in the property values
 
 ### Smart Chips Not Appearing
 
-- Verify that the link preview triggers are configured in `appsscript.json`
-- Check that the URL pattern matches the GitHub issue/PR format
-- Ensure the add-on has the necessary OAuth scopes
+**Problem**: GitHub URLs don't convert to smart chips.
 
-### API Errors
+**Solution**:
 
-- Check the Apps Script logs for error messages
-- Verify that your GitHub token has the required permissions
-- Ensure the GitHub API rate limits haven't been exceeded
+- Verify `appsscript.json` is deployed with the correct link preview triggers
+- Check the Apps Script logs (View > Logs) for errors
+- Ensure the add-on has been authorized
 
-## Security Notes
+### Build Errors
 
-- Never commit your GitHub Client Secret to source control
-- Use Script Properties to store sensitive information
-- Regularly rotate your GitHub OAuth App credentials
-- Monitor the add-on's API usage
+**Problem**: `make push` fails during build.
 
-## Automated Deployment via GitHub Actions
+**Solution**:
 
-The project includes a GitHub Actions workflow that automatically deploys to
-Google Apps Script when a new release is created.
+- Ensure you're using the correct Node.js version (check `.node-version`)
+- Delete `node_modules` and run `npm install` again
+- Check that all prerequisites are installed
 
-### Setup for Automated Deployment
+### Permission Errors
 
-The deployment workflow uses clasp credentials stored as a GitHub secret.
+**Problem**: Clasp commands fail with permission errors.
 
-**Note:** Google Apps Script API does not support service accounts, so Workload
-Identity Federation cannot be used for deployment. See
-[google/clasp#1051](https://github.com/google/clasp/issues/1051) and
-[Issue 442055772](https://issuetracker.google.com/issues/442055772) for more
-details.
+**Solution**:
 
-1. **Generate clasp credentials**:
+- Run `clasp login` again to refresh credentials
+- Verify you have edit access to the Apps Script project
+- Check that the Script ID in `dist/.clasp.json` is correct
 
-    ```bash
-    # Login to Google
-    clasp login
-    ```
+## Security Best Practices
 
-    This creates a `.clasprc.json` file in your home directory containing OAuth
-    credentials.
+- **Never commit secrets**: Keep your Client ID and Client Secret secure
+- **Use Script Properties**: Store all sensitive configuration in Script
+  Properties, never in code
+- **Rotate credentials regularly**: Update your GitHub OAuth App credentials
+  periodically
+- **Monitor usage**: Keep track of API usage in your GitHub OAuth App settings
+- **Limit access**: Only share your Apps Script project with trusted users
 
-2. **Add credentials to GitHub Secrets**:
-    - Go to your GitHub repository settings
-    - Navigate to **Secrets and variables** > **Actions** > **Secrets** tab
-    - Click **New repository secret**
-    - Name: `CLASP_CREDENTIALS`
-    - Value: Copy the entire contents of your `~/.clasprc.json` file
-    - Click **Add secret**
+## Advanced: Production Deployment
 
-### Deployment Triggers
+For a production deployment that doesn't require test mode:
 
-The workflow can be triggered in two ways:
+1. In Apps Script, click **"Deploy"** > **"New deployment"**
+2. Click the gear icon and select type: **"Editor Add-on"**
+3. Configure the deployment:
+    - Add a description
+    - Set visibility (Only myself, specific users, or anyone with the link)
+4. Click **"Deploy"**
+5. Note the **Deployment ID** for future updates
 
-1. **Automatically on release creation**:
+To update a production deployment:
 
-    When you create a new release on GitHub, the deployment workflow will
-    automatically:
-    - Build the TypeScript code
-    - Package the distribution files
-    - Deploy to Google Apps Script using `make deploy`
+```bash
+# Build and push code
+make push
 
-2. **Manually via `workflow_dispatch`**:
-
-    You can manually trigger the deployment from the Actions tab:
-    - Go to the **Actions** tab in your repository
-    - Select the **deploy** workflow
-    - Click **Run workflow**
-
-### Security Notes for CI/CD
-
-- The `CLASP_CREDENTIALS` secret contains OAuth tokens - keep it secure
-- Never commit `.clasprc.json` to the repository
-- Regularly review and rotate credentials if needed
-- The workflow only runs on release events or manual triggers for safety
+# In Apps Script, go to Deploy > Manage deployments
+# Click the pencil icon on your deployment
+# Click "Deploy" to create a new version
+```
 
 ## Support
 
-For issues and questions, please open an issue on the GitHub repository.
+For issues, questions, or contributions:
+
+- [Open an issue](https://github.com/ianlewis/github-smart-chips/issues)
+- [View documentation](https://github.com/ianlewis/github-smart-chips)
+- See [CONFIGURATION.md](CONFIGURATION.md) for detailed configuration options

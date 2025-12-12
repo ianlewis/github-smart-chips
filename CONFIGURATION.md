@@ -1,108 +1,161 @@
-# GitHub Smart Chips Configuration
+# Configuration Guide
 
-This document describes the configuration required for the GitHub Smart Chips
-add-on.
+This guide explains how to configure the GitHub Smart Chips add-on for your
+Google Apps Script project.
 
-## Script Properties
+## Required Script Properties
 
-The following script properties must be configured in your Google Apps Script
-project:
+The add-on requires two script properties to authenticate with GitHub. These
+must be set in your Google Apps Script project settings.
 
 ### `GITHUB_CLIENT_ID`
 
 Your GitHub OAuth App Client ID.
 
-**How to get it:**
+**Format**: Starts with `Iv1.` followed by alphanumeric characters
 
-1. Go to [`https://github.com/settings/developers`](https://github.com/settings/developers)
-2. Click on your OAuth App (or create a new one)
-3. Copy the Client ID
-
-**Example:**
-
-```text
-Iv1.abc123def456
-```
+**Example**: `Iv1.abc123def456`
 
 ### `GITHUB_CLIENT_SECRET`
 
 Your GitHub OAuth App Client Secret.
 
-**How to get it:**
+**Format**: A 40-character hexadecimal string
 
-1. Go to [`https://github.com/settings/developers`](https://github.com/settings/developers)
-2. Click on your OAuth App
-3. Generate a new client secret (or use an existing one)
-4. Copy the secret immediately (it won't be shown again)
+**Example**: `abc123def456ghi789jkl012mno345pqr678stu901`
 
-**Example:**
+## How to Set Script Properties
 
-```text
-abc123def456ghi789jkl012mno345pqr678stu901
-```
+1. Open your Apps Script project at <https://script.google.com>
+2. Click the **gear icon** (Project Settings)
+3. Scroll down to the **"Script Properties"** section
+4. Click **"Add script property"**
+5. Add each property:
+    - **Property name**: `GITHUB_CLIENT_ID`
+    - **Value**: Your GitHub OAuth App Client ID (paste the value)
+6. Click **"Add script property"** again for the second property:
+    - **Property name**: `GITHUB_CLIENT_SECRET`
+    - **Value**: Your GitHub OAuth App Client Secret (paste the value)
+7. Click **"Save script properties"**
 
-## Setting Script Properties
+## Obtaining GitHub OAuth Credentials
 
-### Using Apps Script UI
+If you haven't created a GitHub OAuth App yet, follow these steps:
 
-1. Open your Apps Script project
-2. Click on the gear icon (Project Settings)
-3. Scroll down to "Script Properties"
-4. Click "Add script property"
-5. Enter the property name and value
-6. Click "Save script properties"
-
-### Using clasp
-
-You cannot directly set script properties using clasp, but you can use the Apps
-Script API or set them manually in the UI.
-
-## Environment Variables (Development)
-
-For local development and testing, you can create a `.env` file (do not commit
-this file):
-
-```bash
-GITHUB_CLIENT_ID=your_client_id_here
-GITHUB_CLIENT_SECRET=your_client_secret_here
-```
-
-**Note:** The Apps Script runtime does not use `.env` files. This is only for
-reference during development.
+1. Go to <https://github.com/settings/developers>
+2. Click **"New OAuth App"**
+3. Fill in the form:
+    - **Application name**: Your chosen name (e.g., "GitHub Smart Chips")
+    - **Homepage URL**: Your repository or website URL
+    - **Authorization callback URL**:
+      `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
+        - Replace `{SCRIPT_ID}` with your actual Apps Script project Script ID
+        - Find your Script ID in Project Settings (gear icon)
+4. Click **"Register application"**
+5. Copy the **Client ID** immediately
+6. Click **"Generate a new client secret"**
+7. Copy the **Client Secret** immediately (it won't be displayed again)
 
 ## OAuth Scopes
 
-The add-on requests the following OAuth scopes from GitHub:
+When users authenticate, the add-on requests the `repo` scope from GitHub. This
+scope is required to:
 
-- `repo`: Full control of private repositories (required to access private
-  issues, pull requests, and repositories)
+- Access public repositories
+- Access private repositories (if the user has permission)
+- Fetch issue and pull request details
 
-## Security Recommendations
+Users will be prompted to authorize this scope when they first use the add-on.
 
-1. **Never commit secrets**: Keep your Client ID and Client Secret secure
-2. **Rotate credentials**: Regularly update your GitHub OAuth App credentials
-3. **Limit access**: Only grant the minimum necessary OAuth scopes
-4. **Monitor usage**: Keep track of API usage and authentication attempts
-5. **Use environment-specific apps**: Create separate OAuth Apps for development
-   and production
+## Verifying Your Configuration
 
-## Troubleshooting
+After setting up script properties:
 
-### Invalid Client ID or Secret
+1. Deploy your add-on (see [DEPLOYMENT.md](DEPLOYMENT.md))
+2. Open a Google Doc
+3. Try pasting a GitHub issue URL (e.g.,
+   `https://github.com/octocat/Hello-World/issues/1`)
+4. If prompted, authorize the add-on to access GitHub
+5. The URL should convert to a smart chip with issue details
 
-- Verify that the script properties are set correctly
-- Ensure there are no extra spaces or newlines in the values
-- Check that you're using the correct OAuth App
+## Common Configuration Issues
 
-### Callback URL Mismatch
+### Issue: "Invalid client ID or secret"
 
-- Verify that the callback URL in your GitHub OAuth App matches the Apps Script
-  callback URL
-- The callback URL should be in the format:
-  `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
+**Causes**:
 
-### Permission Denied
+- Script properties are not set
+- Property names are misspelled (they are case-sensitive)
+- Extra spaces or newlines in the values
 
-- Ensure the OAuth scope includes `repo` for private repositories
-- Check that the user has authorized the GitHub OAuth App
-- Verify that the user has access to the repository being accessed
+**Solution**:
+
+1. Verify property names are exactly `GITHUB_CLIENT_ID` and
+   `GITHUB_CLIENT_SECRET`
+2. Check that values don't have trailing spaces or newlines
+3. Try copying and pasting the values again from GitHub
+
+### Issue: "Callback URL mismatch"
+
+**Causes**:
+
+- The callback URL in your GitHub OAuth App doesn't match your Apps Script
+  project
+
+**Solution**:
+
+1. Get your Script ID from Apps Script Project Settings
+2. Update the callback URL in your GitHub OAuth App to:
+   `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
+3. Make sure to replace `{SCRIPT_ID}` with your actual Script ID
+
+### Issue: "Access denied to private repositories"
+
+**Causes**:
+
+- The OAuth App hasn't been authorized for the user
+- The user doesn't have access to the repository
+
+**Solution**:
+
+1. Have the user re-authorize the add-on
+2. Verify the user has access to the repository on GitHub
+3. Check that the `repo` scope is requested during authorization
+
+## Security Best Practices
+
+### Protecting Your Credentials
+
+- **Never commit credentials**: Don't include Client ID or Secret in source code
+- **Use Script Properties**: Always store credentials in Google Apps Script
+  Script Properties
+- **Rotate regularly**: Update your Client Secret periodically
+- **Monitor access**: Check your OAuth App's usage in GitHub settings
+
+### Separate Environments
+
+For production use, consider creating separate GitHub OAuth Apps for:
+
+- **Development/Testing**: For local testing and development deployments
+- **Production**: For your public or shared deployment
+
+This allows you to:
+
+- Use different callback URLs for each environment
+- Revoke access to one environment without affecting the other
+- Track usage separately
+
+### Limiting Access
+
+- Only share your Apps Script project with trusted collaborators
+- Review and audit who has access to Script Properties
+- Monitor the OAuth App's authorized users in GitHub
+
+## Additional Resources
+
+- [GitHub OAuth Apps Documentation](https://docs.github.com/en/apps/oauth-apps)
+- [Google Apps Script Properties
+  Service](https://developers.google.com/apps-script/reference/properties)
+- [Deployment Guide](DEPLOYMENT.md) - How to deploy the add-on
+- [Project Repository](https://github.com/ianlewis/github-smart-chips) - Source
+  code and issues
