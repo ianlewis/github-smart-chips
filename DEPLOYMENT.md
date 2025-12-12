@@ -46,15 +46,28 @@ npm install -g @google/clasp
 
 # Login to your Google account
 clasp login
-
-# Link your Apps Script project
-# Replace <SCRIPT_ID> with your Script ID from step 2
-cd dist
-clasp clone <SCRIPT_ID>
 ```
 
-This creates a `.clasp.json` file in the `dist/` directory linking it to your
-Apps Script project.
+Now create a `.clasp.json` file in the `dist/` directory to link it to your
+Apps Script project:
+
+```bash
+# From the project root directory
+cd dist
+
+# Create .clasp.json with your Script ID
+# Replace <SCRIPT_ID> with your actual Script ID from step 2
+echo '{"scriptId":"<SCRIPT_ID>"}' > .clasp.json
+```
+
+Alternatively, you can manually create a `dist/.clasp.json` file with the
+following content:
+
+```json
+{
+    "scriptId": "YOUR_SCRIPT_ID_HERE"
+}
+```
 
 ### 4. Create GitHub OAuth App
 

@@ -153,7 +153,8 @@ This allows you to:
 
 ## Additional Resources
 
-- [GitHub OAuth Apps Documentation](https://docs.github.com/en/apps/oauth-apps)
+- [GitHub OAuth Apps
+  Documentation](https://docs.github.com/en/apps/oauth-apps)
 - [Google Apps Script Properties
   Service](https://developers.google.com/apps-script/reference/properties)
 - [Deployment Guide](DEPLOYMENT.md) - How to deploy the add-on
