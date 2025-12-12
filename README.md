@@ -68,10 +68,10 @@ src/
 └── index.ts      - Entry point
 ```
 
-## Deployment
+## Self-Hosting
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions and
-[CONFIGURATION.md](CONFIGURATION.md) for configuration details.
+See [SELF-HOSTING.md](SELF-HOSTING.md) for detailed instructions on deploying
+and configuring your own instance of the add-on.
 
 ## Usage
 
