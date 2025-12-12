@@ -20,19 +20,44 @@ site_dir: _site
 
 theme:
   name: landing
+  favicon: github-mark-white.png
 
   header_layout:
     - avatar
     - title
     - tagline
     - socials
+  avatar: GitHub-Mark.png
   avatar_size: 15rem
   tagline: "Smart Chip Preview Links for Google Workspace."
-  avatar: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+
+  page_source:
+    link: https://github.com/ianlewis/github-smart-chips
 
   socials:
     - label: GitHub
       link: https://github.com/ianlewis/github-smart-chips
       icon: [brands, github]
+
+  heading_font: Poppins
+  heading_font_files:
+    regular: "fonts/Poppins-Regular.ttf"
+    bold: "fonts/Poppins-Bold.ttf"
+    italic: "fonts/Poppins-Italic.ttf"
+    bold_italic: "fonts/Poppins-BoldItalic.ttf"
+  # body font
+  body_font: Noto Sans
+  body_font_files:
+    regular: "fonts/NotoSans-VariableFont_wdth,wght.ttf"
+    bold: "fonts/NotoSans-VariableFont_wdth,wght.ttf"
+    italic: "fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf"
+    bold_italic: "fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf"
+  # monospace font
+  mono_font: JetBrains Mono
+  mono_font_files:
+    regular: "fonts/JetBrainsMono-VariableFont_wght.ttf"
+    bold: "fonts/JetBrainsMono-VariableFont_wght.ttf"
+    italic: "fonts/JetBrainsMono-Italic-VariableFont_wght.ttf"
+    bold_italic: "fonts/JetBrainsMono-Italic-VariableFont_wght.ttf"
 
   share_btn: false
