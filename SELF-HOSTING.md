@@ -1,7 +1,7 @@
-# Self-Hosting Deployment Guide
+# Self-Hosting Guide
 
 This guide explains how to self-host and deploy the GitHub Smart Chips add-on
-to your own Google Apps Script project.
+to your own Google Apps Script project, including all necessary configuration.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ deployment.
 
 ### 2. Create Apps Script Project
 
-1. Go to <https://script.google.com/>
+1. Go to [Google Apps Script](https://script.google.com/)
 2. Click **"New Project"**
 3. Give your project a name (e.g., "My GitHub Smart Chips")
 4. Click the gear icon (Project Settings) and note your **Script ID** - you'll
@@ -71,7 +71,10 @@ following content:
 
 ### 4. Create GitHub OAuth App
 
-1. Go to <https://github.com/settings/developers>
+The add-on requires a GitHub OAuth App to authenticate users and access
+repository data.
+
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Click **"New OAuth App"**
 3. Fill in:
     - **Application name**: `GitHub Smart Chips` (or your preferred name)
@@ -85,7 +88,27 @@ following content:
 6. Click **"Generate a new client secret"** and copy the **Client Secret**
    immediately (it won't be shown again)
 
+#### OAuth Credential Formats
+
+- **Client ID**: Starts with `Iv1.` followed by alphanumeric characters
+    - Example: `Iv1.abc123def456`
+- **Client Secret**: A 40-character hexadecimal string
+    - Example: `abc123def456ghi789jkl012mno345pqr678stu901`
+
+#### OAuth Scopes
+
+The add-on requests the `repo` scope from GitHub, which is required to:
+
+- Access public repositories
+- Access private repositories (if the user has permission)
+- Fetch issue and pull request details
+
+Users will be prompted to authorize this scope when they first use the add-on.
+
 ### 5. Configure Script Properties
+
+Script properties are used to securely store your GitHub OAuth credentials in
+Apps Script.
 
 1. In your Apps Script project, click the gear icon (Project Settings)
 2. Scroll to **"Script Properties"**
@@ -94,6 +117,9 @@ following content:
     - Property: `GITHUB_CLIENT_SECRET`, Value: Your GitHub OAuth App Client
       Secret
 4. Click **"Save script properties"**
+
+**Important**: Property names are case-sensitive and must be exactly
+`GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
 
 ### 6. Deploy to Apps Script
 
@@ -118,6 +144,16 @@ This command builds and pushes your code to Google Apps Script.
    `https://github.com/owner/repo/issues/123`)
 3. The URL will automatically convert to a smart chip showing the issue/PR
    details
+
+## Verifying Your Setup
+
+After completing the setup:
+
+1. Open a Google Doc
+2. Try pasting a GitHub issue URL (e.g.,
+   `https://github.com/octocat/Hello-World/issues/1`)
+3. If prompted, authorize the add-on to access GitHub
+4. The URL should convert to a smart chip with issue details
 
 ## Updating Your Deployment
 
@@ -147,6 +183,41 @@ make push
 - Ensure `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` are set correctly in
   Script Properties
 - Check for extra spaces or newlines in the property values
+- Verify property names are exactly `GITHUB_CLIENT_ID` and
+  `GITHUB_CLIENT_SECRET` (case-sensitive)
+
+### Invalid Client ID or Secret
+
+**Problem**: Error message about invalid credentials.
+
+**Causes**:
+
+- Script properties are not set
+- Property names are misspelled (they are case-sensitive)
+- Extra spaces or newlines in the values
+
+**Solution**:
+
+1. Verify property names are exactly `GITHUB_CLIENT_ID` and
+   `GITHUB_CLIENT_SECRET`
+2. Check that values don't have trailing spaces or newlines
+3. Try copying and pasting the values again from GitHub
+
+### Callback URL Mismatch
+
+**Problem**: OAuth redirect fails with a mismatch error.
+
+**Causes**:
+
+- The callback URL in your GitHub OAuth App doesn't match your Apps Script
+  project
+
+**Solution**:
+
+1. Get your Script ID from Apps Script Project Settings
+2. Update the callback URL in your GitHub OAuth App to:
+   `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
+3. Make sure to replace `{SCRIPT_ID}` with your actual Script ID
 
 ### Smart Chips Not Appearing
 
@@ -157,6 +228,21 @@ make push
 - Verify `appsscript.json` is deployed with the correct link preview triggers
 - Check the Apps Script logs (View > Logs) for errors
 - Ensure the add-on has been authorized
+
+### Access Denied to Private Repositories
+
+**Problem**: Cannot access private repositories.
+
+**Causes**:
+
+- The OAuth App hasn't been authorized for the user
+- The user doesn't have access to the repository
+
+**Solution**:
+
+1. Have the user re-authorize the add-on
+2. Verify the user has access to the repository on GitHub
+3. Check that the `repo` scope is requested during authorization
 
 ### Build Errors
 
@@ -180,13 +266,32 @@ make push
 
 ## Security Best Practices
 
-- **Never commit secrets**: Keep your Client ID and Client Secret secure
-- **Use Script Properties**: Store all sensitive configuration in Script
-  Properties, never in code
-- **Rotate credentials regularly**: Update your GitHub OAuth App credentials
-  periodically
-- **Monitor usage**: Keep track of API usage in your GitHub OAuth App settings
-- **Limit access**: Only share your Apps Script project with trusted users
+### Protecting Your Credentials
+
+- **Never commit credentials**: Don't include Client ID or Secret in source code
+- **Use Script Properties**: Always store credentials in Google Apps Script
+  Script Properties
+- **Rotate regularly**: Update your Client Secret periodically
+- **Monitor access**: Check your OAuth App's usage in GitHub settings
+
+### Separate Environments
+
+For production use, consider creating separate GitHub OAuth Apps for:
+
+- **Development/Testing**: For local testing and development deployments
+- **Production**: For your public or shared deployment
+
+This allows you to:
+
+- Use different callback URLs for each environment
+- Revoke access to one environment without affecting the other
+- Track usage separately
+
+### Limiting Access
+
+- Only share your Apps Script project with trusted collaborators
+- Review and audit who has access to Script Properties
+- Monitor the OAuth App's authorized users in GitHub
 
 ## Advanced: Production Deployment
 
@@ -211,10 +316,16 @@ make push
 # Click "Deploy" to create a new version
 ```
 
+## Additional Resources
+
+- [GitHub OAuth Apps
+  Documentation](https://docs.github.com/en/apps/oauth-apps)
+- [Google Apps Script Properties
+  Service](https://developers.google.com/apps-script/reference/properties)
+
 ## Support
 
 For issues, questions, or contributions:
 
 - [Open an issue](https://github.com/ianlewis/github-smart-chips/issues)
 - [View documentation](https://github.com/ianlewis/github-smart-chips)
-- See [CONFIGURATION.md](CONFIGURATION.md) for detailed configuration options
