@@ -60,6 +60,9 @@ project's Script ID:
 
 Replace `YOUR_SCRIPT_ID_HERE` with your actual Script ID from step 2.
 
+**Note**: The build process automatically copies this file to the `dist/`
+directory where clasp uses it for deployment.
+
 ### 5. Create GitHub OAuth App
 
 The add-on requires a GitHub OAuth App to authenticate users and access
@@ -250,7 +253,7 @@ make push
 
 - Run `make clasp-login` again to refresh credentials
 - Verify you have edit access to the Apps Script project
-- Check that the Script ID in `.clasp.json` is correct
+- Check that the Script ID in `.clasp.json` (in the project root) is correct
 
 ## Security Best Practices
 
