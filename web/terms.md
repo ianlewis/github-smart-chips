@@ -16,8 +16,8 @@ regardless of whether they appear in singular or in plural.
 
 For the purposes of these Terms and Conditions:
 
-- **Application** means the software provided by Us, installed by You via Google
-  Workspace named GitHub Smart Chips
+- **Application** means the software provided by Us, installed by You via
+  Google Workspace™ named GitHub Smart Chips
 - **Country** refers to: Japan
 - **Us** (referred to as either "We", "Us" or "Our" in this Agreement) refers to
   the developers of GitHub Smart Chips.
