@@ -1,6 +1,6 @@
-GitHub Smart Chips is a Google Docs add-on that provides smart chips with
+GitHub Smart Chips is a Google Docs™ add-on that provides smart chips with
 preview links for GitHub issues and pull requests. This add-on displays GitHub
-issue and pull request information directly in Google Docs with rich preview
+issue and pull request information directly in Google Docs™ with rich preview
 cards.
 
 # Getting Started
@@ -23,7 +23,8 @@ You can also convert an existing link in the link popup.
 
 # Features
 
-The following link types are supported in Google Docs, Sheets, and Slides:
+The following link types are supported in Google Docs™, Google Sheets™, and
+Google Slides™:
 
 ## Repositories
 
@@ -51,5 +52,5 @@ count are displayed in the preview card.
 
 # Terms & Privacy
 
-This project is not affiliated with GitHub or Google. Please refer to the [Terms
+This project is not affiliated with GitHub or Google™. Please refer to the [Terms
 of Service](./terms.md) and [Privacy Policy](./privacy.md) for more information.
