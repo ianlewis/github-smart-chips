@@ -179,7 +179,7 @@ pack: build ## Builds the distribution.
 	$(REPO_ROOT)/node_modules/.bin/rollup \
 		--config rollup.config.ts
 
-## Deployment
+## Apps Script
 #####################################################################
 
 .PHONY: login
@@ -190,7 +190,7 @@ login: node_modules/.installed ## Authenticate with Google Apps Script via clasp
 .PHONY: script
 script: node_modules/.installed ## Create a new Apps Script script via clasp.
 	@# bash \
-	echo "This will delete the existing .clasp.json file if it exists."; \
+	echo "This will delete the existing .clasp.json file."; \
 	echo -n "Are you sure you want to continue? (y/N) "; \
 	read -r answer; \
 	if [ "$$answer" != "y" ] && [ "$$answer" != "Y" ]; then \
@@ -206,6 +206,10 @@ script: node_modules/.installed ## Create a new Apps Script script via clasp.
 	# Format the .clasp.json file. \
 	$(MAKE) format
 
+.PHONY: goto-apps-script
+goto-apps-script: node_modules/.installed ## Open the Apps Script project in the browser.
+	$(REPO_ROOT)/node_modules/.bin/clasp open-script
+
 .PHONY: push
 push: pack ## Push the latest code to Apps Script.
 	@# bash \
@@ -214,17 +218,23 @@ push: pack ## Push the latest code to Apps Script.
 		$(REPO_ROOT)/node_modules/.bin/clasp push --force; \
 	)
 
-.PHONY: deployment
-deployment: push ## Create a new Apps Script deployment.
+.PHONY: version
+version: push ## Create a new Apps Script version.
 	@# bash \
 	( \
 		if [ -z "$${GITHUB_REF_NAME:-}" ]; then \
-			>&2 echo "GITHUB_REF_NAME is not set. Cannot create deployment."; \
+			>&2 echo "GITHUB_REF_NAME is not set."; \
+			exit 1; \
+		fi; \
+		if [ -z "$${APPSSCRIPT_DEPLOYMENT_ID:-}" ]; then \
+			>&2 echo "APPSSCRIPT_DEPLOYMENT_ID is not set."; \
 			exit 1; \
 		fi; \
 		cd $(REPO_ROOT)/dist; \
-		$(REPO_ROOT)/node_modules/.bin/clasp create-deployment \
-			--description "$${GITHUB_REF_NAME}" ; \
+		VERSION_NUMBER=$$($(REPO_ROOT)/node_modules/.bin/clasp create-version "${GITHUB_REF_NAME}" | tr -cd '[:digit:]'); \
+		$(REPO_ROOT)/node_modules/.bin/clasp update-deployment \
+			--versionNumber "$${VERSION_NUMBER}" \
+			"$${APPSSCRIPT_DEPLOYMENT_ID}"; \
 	)
 
 ## Testing
