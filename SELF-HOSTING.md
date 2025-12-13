@@ -41,7 +41,7 @@ Authenticate with your Google account to enable deployment:
 
 ```bash
 # Login to your Google account
-make clasp-login
+make login
 ```
 
 This will open a browser window for you to authorize access to your Google
@@ -254,7 +254,7 @@ make push
 
 **Solution**:
 
-- Run `make clasp-login` again to refresh credentials
+- Run `make login` again to refresh credentials
 - Verify you have edit access to the Apps Script project
 - Check that the Script ID in `.clasp.json` (in the project root) is correct
 
@@ -304,10 +304,10 @@ To create a new production deployment:
 ```bash
 # Option 1: Set environment variable then run make
 export GITHUB_REF_NAME="v1.0.0"
-make create-deployment
+make deployment
 
 # Option 2: Set environment variable inline
-GITHUB_REF_NAME="v1.0.0" make create-deployment
+GITHUB_REF_NAME="v1.0.0" make deployment
 ```
 
 The deployment will be created with the description from the `GITHUB_REF_NAME`
