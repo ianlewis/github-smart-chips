@@ -1,9 +1,9 @@
 {
   "scriptId": "1C5OAeQWpdbpTEz5Vt5FbV_d_VyHmkJcVdfw5cjvg6ls5qEKXqWTwVbpC",
   "rootDir": "",
+  "projectId": "github-smart-chips",
   "scriptExtensions": [".js", ".gs"],
   "htmlExtensions": [".html"],
   "jsonExtensions": [".json"],
-  "filePushOrder": [],
-  "skipSubdirectories": false
+  "filePushOrder": []
 }

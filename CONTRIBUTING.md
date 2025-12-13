@@ -76,6 +76,21 @@ Next you can develop your new feature or bug-fix. Please see the following
 sections on how to use the various tools used by this project during
 development.
 
+#### Prerequisites
+
+##### Local Environment
+
+- Node.js (see `.node-version`)
+- Python (see `.python-version`)
+- GNU Make
+
+##### Google Apps Script Project
+
+To test the add-on, you need to create a Google Apps Script project and set up
+OAuth credentials. See the [Self-Hosting Guide](./docs/SELF-HOSTING.md) doc for
+more info on how to create a Google Apps Script project and set up OAuth
+credentials.
+
 #### The Makefile
 
 This repository makes heavy use of `make` for executing commands during

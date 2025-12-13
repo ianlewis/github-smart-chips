@@ -1,102 +1,58 @@
-# GitHub Smart Chips
+# GitHub Smart Chips Add-on for Google Workspace™︎
 
 [![tests](https://github.com/ianlewis/github-smart-chips/actions/workflows/pull_request.tests.yml/badge.svg)](https://github.com/ianlewis/github-smart-chips/actions/workflows/pull_request.tests.yml)
 [![Codecov](https://codecov.io/gh/ianlewis/github-smart-chips/graph/badge.svg?token=5F4B33RNHD)](https://codecov.io/gh/ianlewis/github-smart-chips)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ianlewis/github-smart-chips/badge)](https://securityscorecards.dev/viewer/?uri=github.com%2Fianlewis%2Fgithub-smart-chips)
 
-A Google Docs add-on that provides smart chips with preview links for GitHub
-issues and pull requests. This add-on displays GitHub issue and PR information
-directly in Google Docs with rich preview cards.
+A Google Workspace™︎ add-on that provides smart chips with preview links for
+GitHub issues and pull requests. This add-on displays GitHub repository, user,
+issue, and pull request information directly in Google Docs™︎, Google Sheets™︎,
+and Google Slides™︎.
 
 ![A preview link for a GitHub issue with preview popup](./docs/assets/images/screenshots/issue.png)
 
 ## Features
 
 - **Smart Chips for GitHub Links**: Automatically recognizes GitHub issue and PR
-  URLs
+  URLs.
 - **Rich Previews**: Displays repository owner, name, issue/PR number, title,
-  and status
-- **OAuth Authentication**: Supports private repositories via GitHub OAuth
+  and status.
+- **OAuth Authentication**: Supports private repositories via GitHub OAuth.
+- **Cross-Platform**: Works in Google Docs™, Sheets™, and Slides™︎.
+- **Multiple URL Patterns**: Supports various GitHub URLs:
+    - User: `https://github.com/{user/org}`
+    - Repository: `https://github.com/{owner}/{repo}`
+    - Issue: `https://github.com/{owner}/{repo}/issues/{number}`
+    - Pull Request: `https://github.com/{owner}/{repo}/pull/{number}`
 
-### Supported URL Patterns
+## Usage
 
-- `https://github.com/{user/org}`
-- `https://github.com/{owner}/{repo}`
-- `https://github.com/{owner}/{repo}/issues/{number}`
-- `https://github.com/{owner}/{repo}/pull/{number}`
+After installation, simply paste a GitHub issue or pull request URL into a
+Google Doc, Sheet, or Slide. A prompt will appear to convert the URL into a
+smart chip.
 
-## Architecture
+![smart chip preview prompt](./docs/assets/images/screenshots/chip.png)
 
-The add-on is implemented in TypeScript and compiled to JavaScript for Google
-Apps Script. It uses:
+You can also convert existing links to a chip by putting the cursor over the
+link and clicking the "Chip" button that appears in the "Replace URL" prompt.
 
-- **Google Apps Script**: Runtime environment
-- **OAuth2 Library**: For GitHub authentication
-- **GitHub REST API**: To fetch issue and PR data
-- **Link Preview Triggers**: To detect and handle GitHub URLs
+![smart chip preview conversion prompt](./docs/assets/images/screenshots/replace.png)
 
-## Development
+After the smart chip is created, hovering over it will display a rich preview
+with additional information about the link target. For example, here is a what
+the preview for a pull request looks like:
 
-### Prerequisites
-
-#### Local Environment
-
-- Node.js (see `.node-version`)
-- Python (see `.python-version`)
-- GNU Make
-
-#### Google Apps Script Project
-
-To test the add-on, you need to create a Google Apps Script project and set up
-OAuth credentials:
-
-```bash
-# Authenticate with Google.
-make login
-
-# Create a new Apps Script project.
-make script
-```
-
-### Setup
-
-Dependencies are managed within the project by the `Makefile`. Some of the more
-common tasks are:
-
-```bash
-# Build the project
-make build
-
-# Run tests
-make unit-test
-
-# Run linters
-make lint
-
-# Format code
-make format
-```
-
-### Project Structure
-
-```text
-src/
-├── addon.ts      - Main add-on logic and link preview handler
-├── github.ts     - GitHub URL parsing and API calls
-├── oauth.ts      - OAuth2 authentication with GitHub
-├── types.ts      - TypeScript type definitions
-├── ui.ts         - UI components (cards and smart chips)
-└── index.ts      - Entry point
-```
+![a preview popup of a pull request](./docs/assets/images/screenshots/pr.png)
 
 ## Self-Hosting
 
-Due to limitations in the Google Workspace Marketplace, this add-on cannot be
-published there. However, you can self-host the add-on for your own use or
-organization.
+Due to limitations in the Google Workspace™︎ Marketplace requiring the developer
+of smart chips add-ons to be affiliated with the previewed domain, this add-on
+cannot be published publicly. However, you can self-host the add-on for your own
+use or Google Workspace™︎ organization.
 
-See [SELF-HOSTING.md](./SELF-HOSTING.md) for detailed instructions on deploying
-and configuring your own instance of the add-on.
+See the [Self-Hosting Guide](./docs/SELF-HOSTING.md) for detailed instructions
+on deploying and configuring your own instance of the add-on.
 
 ## License
 
