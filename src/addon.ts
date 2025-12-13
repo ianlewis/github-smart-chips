@@ -19,6 +19,7 @@ import {
   createIssueCard,
   createPullRequestCard,
   createUserCard,
+  createErrorCard,
 } from "./ui.js";
 import { GITHUB_LOGO } from "./logos.js";
 
@@ -113,6 +114,7 @@ export function onLinkPreview(
   if (!card) {
     return [
       createErrorCard(
+        url,
         "Unable to fetch repository data. The repository may not exist or you may not have access to it.",
       ),
     ];
@@ -156,31 +158,6 @@ export function createAuthorizationCard(): GoogleAppsScript.Card_Service.Card {
           "Note: Public repositories may still be accessible without authorization.",
         ),
       ),
-    )
-    .build();
-}
-
-/**
- * Create an error card to display when something goes wrong
- */
-function createErrorCard(message: string): GoogleAppsScript.Card_Service.Card {
-  return CardService.newCardBuilder()
-    .setHeader(
-      CardService.newCardHeader()
-        .setTitle("GitHub Smart Chips")
-        .setSubtitle("Error")
-        .setImageUrl(GITHUB_LOGO),
-    )
-    .addSection(
-      CardService.newCardSection()
-        .addWidget(CardService.newTextParagraph().setText(message))
-        .addWidget(
-          CardService.newTextButton()
-            .setText("Try Again")
-            .setOnClickAction(
-              CardService.newAction().setFunctionName("resetAuth"),
-            ),
-        ),
     )
     .build();
 }

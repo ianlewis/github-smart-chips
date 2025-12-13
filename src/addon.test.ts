@@ -359,28 +359,30 @@ describe("onLinkPreview", () => {
       expect(mockCardBuilder.build).toHaveBeenCalled();
     });
 
-    // TODO(#30): mock OAuth2 in addon tests
-    //   it("should return error card when token exists but no data", () => {
-    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //     (globalThis as any).UrlFetchApp.fetch.mockReturnValueOnce({
-    //       getResponseCode: () => 404,
-    //       getContentText: () => null,
-    //     });
-    //
-    //     const event = {
-    //       docs: {
-    //         matchedUrl: {
-    //           url: "https://github.com/owner/repo",
-    //         },
-    //       },
-    //     };
-    //
-    //     const result = onLinkPreview(event);
-    //
-    //     expect(result).toHaveLength(1);
-    //     expect(mockCardBuilder.build).toHaveBeenCalled();
-    //   });
-    // });
+    it("should return error card when token exists but no data", () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).UrlFetchApp.fetch.mockReturnValueOnce({
+        getResponseCode: () => 404,
+        getContentText: () => null,
+      });
+
+      const event = {
+        docs: {
+          matchedUrl: {
+            url: "https://github.com/owner/repo",
+          },
+        },
+      };
+
+      const result = onLinkPreview(event);
+
+      expect(result).toHaveLength(1);
+      expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
+        "https://github.com/owner/repo",
+      );
+      expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith("Error");
+      expect(mockCardBuilder.build).toHaveBeenCalled();
+    });
 
     describe("Client instantiation", () => {
       it("should create client with empty string when no token available", () => {

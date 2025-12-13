@@ -353,3 +353,31 @@ export function createUserCard(
 
   return cardBuilder.build();
 }
+
+/**
+ * Create an error card to display when something goes wrong
+ */
+export function createErrorCard(
+  url: string,
+  message: string,
+): GoogleAppsScript.Card_Service.Card {
+  return CardService.newCardBuilder()
+    .setHeader(
+      CardService.newCardHeader()
+        .setTitle(url)
+        .setSubtitle("Error")
+        .setImageUrl(GITHUB_LOGO),
+    )
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(CardService.newTextParagraph().setText(message))
+        .addWidget(
+          CardService.newTextButton()
+            .setText("Try Again")
+            .setOnClickAction(
+              CardService.newAction().setFunctionName("resetAuth"),
+            ),
+        ),
+    )
+    .build();
+}
