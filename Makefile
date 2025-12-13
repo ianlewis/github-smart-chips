@@ -179,10 +179,32 @@ pack: build ## Builds the distribution.
 	$(REPO_ROOT)/node_modules/.bin/rollup \
 		--config rollup.config.ts
 
-.PHONY: clasp-login
-clasp-login: node_modules/.installed ## Authenticate with Google Apps Script via clasp.
+## Deployment
+#####################################################################
+
+.PHONY: login
+login: node_modules/.installed ## Authenticate with Google Apps Script via clasp.
 	@# bash \
 	$(REPO_ROOT)/node_modules/.bin/clasp login
+
+.PHONY: script
+script: node_modules/.installed ## Create a new Apps Script script via clasp.
+	@# bash \
+	echo "This will delete the existing .clasp.json file if it exists."; \
+	echo -n "Are you sure you want to continue? (y/N) "; \
+	read -r answer; \
+	if [ "$$answer" != "y" ] && [ "$$answer" != "Y" ]; then \
+		echo "Aborting."; \
+		exit 1; \
+	fi; \
+	$(RM) -f .clasp.json; \
+	$(REPO_ROOT)/node_modules/.bin/clasp create \
+		--title "GitHub Smart Chips"; \
+	# Restore the appsscript.json file to avoid committing changes made by
+	# clasp. \
+	git checkout -- appsscript.json; \
+	# Format the .clasp.json file. \
+	$(MAKE) format
 
 .PHONY: push
 push: pack ## Push the latest code to Apps Script.
@@ -192,8 +214,8 @@ push: pack ## Push the latest code to Apps Script.
 		$(REPO_ROOT)/node_modules/.bin/clasp push --force; \
 	)
 
-.PHONY: create-deployment
-create-deployment: push ## Create a new Apps Script deployment.
+.PHONY: deployment
+deployment: push ## Create a new Apps Script deployment.
 	@# bash \
 	( \
 		if [ -z "$${GITHUB_REF_NAME:-}" ]; then \
@@ -204,8 +226,6 @@ create-deployment: push ## Create a new Apps Script deployment.
 		$(REPO_ROOT)/node_modules/.bin/clasp create-deployment \
 			--description "$${GITHUB_REF_NAME}" ; \
 	)
-
-
 
 ## Testing
 #####################################################################
@@ -220,19 +240,6 @@ unit-test: node_modules/.installed ## Runs all unit tests.
 	NODE_OPTIONS=--experimental-vm-modules \
 	NODE_NO_WARNINGS=1 \
 		$(REPO_ROOT)/node_modules/.bin/jest --coverage
-
-## GitHub Pages
-#####################################################################
-
-.PHONY: mkdocs
-mkdocs: .venv/.installed ## Build MkDocs site.
-	@# bash \
-	$(REPO_ROOT)/.venv/bin/mkdocs build --clean
-
-.PHONY: serve
-serve: mkdocs ## Serve the website locally.
-	@# bash \
-	$(REPO_ROOT)/.venv/bin/python3 -m http.server --directory _site/
 
 ## Formatting
 #####################################################################
