@@ -543,4 +543,59 @@ describe("GitHubAPIClient", () => {
       expect(result).toBeNull();
     });
   });
+
+  describe("fetchAuthenticatedUser", () => {
+    it("should fetch authenticated user data successfully", () => {
+      const mockUser = {
+        login: "octocat",
+        name: "The Octocat",
+        avatar_url: "https://avatars.githubusercontent.com/u/123",
+        html_url: "https://github.com/octocat",
+      };
+
+      const mockResponse = {
+        getResponseCode: () => 200,
+        getContentText: () => JSON.stringify(mockUser),
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchAuthenticatedUser();
+
+      expect(result).toEqual(mockUser);
+      expect(mockUrlFetch).toHaveBeenCalledWith(
+        "https://api.github.com/user",
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-token",
+          }),
+        }),
+      );
+    });
+
+    it("should return null when API returns error", () => {
+      const mockResponse = {
+        getResponseCode: () => 401,
+        getContentText: () => "Unauthorized",
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchAuthenticatedUser();
+
+      expect(result).toBeNull();
+    });
+
+    it("should handle API fetch exceptions", () => {
+      mockUrlFetch.mockImplementation(() => {
+        throw new Error("Network error");
+      });
+
+      const result = client.fetchAuthenticatedUser();
+
+      expect(result).toBeNull();
+    });
+  });
 });

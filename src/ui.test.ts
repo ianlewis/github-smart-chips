@@ -18,6 +18,7 @@ import {
   createPullRequestCard,
   createRepositoryCard,
   createUserCard,
+  createSettingsSidebar,
 } from "./ui.js";
 import {
   type GitHubRepository,
@@ -57,10 +58,13 @@ const mockTextParagraph = {
 const mockTextButton = {
   setText: jest.fn().mockReturnThis(),
   setOpenLink: jest.fn().mockReturnThis(),
+  setOnClickAction: jest.fn().mockReturnThis(),
 };
 
 const mockOpenLink = {
   setUrl: jest.fn().mockReturnThis(),
+  setOpenAs: jest.fn().mockReturnThis(),
+  setOnClose: jest.fn().mockReturnThis(),
 };
 
 beforeEach(() => {
@@ -553,5 +557,74 @@ describe("createUserCard", () => {
     createUserCard(data);
 
     expect(mockCardHeader.setTitle).toHaveBeenCalledWith("username");
+  });
+});
+
+describe("createSettingsSidebar", () => {
+  const mockAction = {
+    setFunctionName: jest.fn().mockReturnThis(),
+  };
+
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).CardService.newAction = jest.fn(() => mockAction);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).CardService.OpenAs = { OVERLAY: "OVERLAY" };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).CardService.OnClose = { RELOAD: "RELOAD" };
+  });
+
+  it("should create a sidebar for a logged in user", () => {
+    const user: GitHubUser = {
+      login: "octocat",
+      name: "The Octocat",
+      avatar_url: "https://avatars.githubusercontent.com/u/123",
+      html_url: "https://github.com/octocat",
+    };
+
+    const authUrl = "https://github.com/login/oauth/authorize";
+
+    createSettingsSidebar(user, authUrl);
+
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("GitHub Smart Chips");
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith("Settings");
+    expect(mockKeyValue.setTopLabel).toHaveBeenCalledWith("Logged in as");
+    expect(mockKeyValue.setContent).toHaveBeenCalledWith("@octocat");
+    expect(mockKeyValue.setTopLabel).toHaveBeenCalledWith("Name");
+    expect(mockKeyValue.setContent).toHaveBeenCalledWith("The Octocat");
+    expect(mockTextButton.setText).toHaveBeenCalledWith("Logout");
+    expect(mockAction.setFunctionName).toHaveBeenCalledWith("handleLogout");
+  });
+
+  it("should create a sidebar for a logged in user without name", () => {
+    const user: GitHubUser = {
+      login: "octocat",
+      avatar_url: "https://avatars.githubusercontent.com/u/123",
+      html_url: "https://github.com/octocat",
+    };
+
+    const authUrl = "https://github.com/login/oauth/authorize";
+
+    createSettingsSidebar(user, authUrl);
+
+    expect(mockKeyValue.setTopLabel).toHaveBeenCalledWith("Logged in as");
+    expect(mockKeyValue.setContent).toHaveBeenCalledWith("@octocat");
+    expect(mockTextButton.setText).toHaveBeenCalledWith("Logout");
+  });
+
+  it("should create a sidebar for a logged out user", () => {
+    const authUrl = "https://github.com/login/oauth/authorize";
+
+    createSettingsSidebar(null, authUrl);
+
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("GitHub Smart Chips");
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith("Settings");
+    expect(mockTextParagraph.setText).toHaveBeenCalledWith(
+      "You are not currently logged in. To access private repositories, please authorize this add-on.",
+    );
+    expect(mockTextButton.setText).toHaveBeenCalledWith(
+      "Authorize GitHub Access",
+    );
+    expect(mockOpenLink.setUrl).toHaveBeenCalledWith(authUrl);
   });
 });

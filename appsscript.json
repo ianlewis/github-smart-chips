@@ -29,7 +29,7 @@
         "secondaryColor": "#586069"
       },
       "homepageTrigger": {
-        "runFunction": "onLinkPreview"
+        "runFunction": "showSidebar"
       },
       "universalActions": [],
       "openLinkUrlPrefixes": ["https://github.com/"]

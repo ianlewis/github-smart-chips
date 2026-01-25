@@ -16,7 +16,7 @@ import { describe, it, expect, jest, beforeEach } from "@jest/globals";
 
 // Import after mocking
 // prettier-ignore
-import { onLinkPreview } from "./addon.js";
+import { onLinkPreview, showSidebar, handleLogout } from "./addon.js";
 
 const mockCardAction = {
   setFunctionName: jest.fn().mockReturnThis(),
@@ -421,5 +421,127 @@ describe("onLinkPreview", () => {
         expect(mockCardBuilder.build).toHaveBeenCalled();
       });
     });
+  });
+});
+
+describe("showSidebar", () => {
+  it("should show sidebar with user info when logged in", () => {
+    // Mock UrlFetchApp
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).UrlFetchApp = {
+      fetch: jest.fn().mockReturnValue({
+        getResponseCode: jest.fn(() => 200),
+        getContentText: jest.fn(() =>
+          JSON.stringify({
+            login: "octocat",
+            name: "The Octocat",
+            avatar_url: "https://avatars.githubusercontent.com/u/123",
+            html_url: "https://github.com/octocat",
+          }),
+        ),
+      }),
+    };
+
+    // Mock OAuth2 to return access token
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).OAuth2 = {
+      createService: jest.fn(() => ({
+        setAuthorizationBaseUrl: jest.fn().mockReturnThis(),
+        setTokenUrl: jest.fn().mockReturnThis(),
+        setClientId: jest.fn().mockReturnThis(),
+        setClientSecret: jest.fn().mockReturnThis(),
+        setCallbackFunction: jest.fn().mockReturnThis(),
+        setPropertyStore: jest.fn().mockReturnThis(),
+        setScope: jest.fn().mockReturnThis(),
+        hasAccess: jest.fn(() => true),
+        getAccessToken: jest.fn(() => "test-token"),
+        getAuthorizationUrl: jest.fn(() => "https://github.com/oauth"),
+      })),
+    };
+
+    const result = showSidebar();
+
+    expect(result).toHaveLength(1);
+    expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+
+  it("should show sidebar with login button when not logged in", () => {
+    // Mock OAuth2 to return no access
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).OAuth2 = {
+      createService: jest.fn(() => ({
+        setAuthorizationBaseUrl: jest.fn().mockReturnThis(),
+        setTokenUrl: jest.fn().mockReturnThis(),
+        setClientId: jest.fn().mockReturnThis(),
+        setClientSecret: jest.fn().mockReturnThis(),
+        setCallbackFunction: jest.fn().mockReturnThis(),
+        setPropertyStore: jest.fn().mockReturnThis(),
+        setScope: jest.fn().mockReturnThis(),
+        hasAccess: jest.fn(() => false),
+        getAuthorizationUrl: jest.fn(() => "https://github.com/oauth"),
+      })),
+    };
+
+    const result = showSidebar();
+
+    expect(result).toHaveLength(1);
+    expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+});
+
+describe("handleLogout", () => {
+  const mockActionResponseBuilder = {
+    setNavigation: jest.fn().mockReturnThis(),
+    setNotification: jest.fn().mockReturnThis(),
+    build: jest.fn().mockReturnValue({ id: "mock-action-response" }),
+  };
+
+  const mockNavigation = {
+    updateCard: jest.fn().mockReturnThis(),
+  };
+
+  const mockNotification = {
+    setText: jest.fn().mockReturnThis(),
+  };
+
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).CardService.newActionResponseBuilder = jest.fn(
+      () => mockActionResponseBuilder,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).CardService.newNavigation = jest.fn(
+      () => mockNavigation,
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).CardService.newNotification = jest.fn(
+      () => mockNotification,
+    );
+  });
+
+  it("should handle logout and update sidebar", () => {
+    const mockReset = jest.fn();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).OAuth2 = {
+      createService: jest.fn(() => ({
+        setAuthorizationBaseUrl: jest.fn().mockReturnThis(),
+        setTokenUrl: jest.fn().mockReturnThis(),
+        setClientId: jest.fn().mockReturnThis(),
+        setClientSecret: jest.fn().mockReturnThis(),
+        setCallbackFunction: jest.fn().mockReturnThis(),
+        setPropertyStore: jest.fn().mockReturnThis(),
+        setScope: jest.fn().mockReturnThis(),
+        reset: mockReset,
+        getAuthorizationUrl: jest.fn(() => "https://github.com/oauth"),
+      })),
+    };
+
+    const result = handleLogout();
+
+    expect(mockReset).toHaveBeenCalled();
+    expect(mockNotification.setText).toHaveBeenCalledWith(
+      "Successfully logged out",
+    );
+    expect(result).toEqual({ id: "mock-action-response" });
   });
 });

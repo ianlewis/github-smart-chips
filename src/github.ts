@@ -213,4 +213,32 @@ export class GitHubAPIClient {
       return null;
     }
   }
+
+  /**
+   * Fetch authenticated user details
+   */
+  fetchAuthenticatedUser(): GitHubUser | null {
+    const apiUrl = "https://api.github.com/user";
+
+    try {
+      const response = UrlFetchApp.fetch(apiUrl, {
+        headers: this.headers(),
+        muteHttpExceptions: true,
+      });
+
+      if (response.getResponseCode() !== 200) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
+        );
+        return null;
+      }
+
+      return JSON.parse(response.getContentText()) as GitHubUser;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching authenticated user data: ${error}`);
+      return null;
+    }
+  }
 }
