@@ -13,13 +13,14 @@
 // limitations under the License.
 
 import { parseGitHubURL, GitHubAPIClient } from "./github.js";
-import { getAccessToken, getAuthorizationUrl } from "./oauth.js";
+import { getAccessToken, getAuthorizationUrl, resetAuth } from "./oauth.js";
 import {
   createRepositoryCard,
   createIssueCard,
   createPullRequestCard,
   createUserCard,
   createErrorCard,
+  createSettingsSidebar,
 } from "./ui.js";
 import { GITHUB_LOGO } from "./logos.js";
 
@@ -158,6 +159,43 @@ export function createAuthorizationCard(): GoogleAppsScript.Card_Service.Card {
           "Note: Public repositories may still be accessible without authorization.",
         ),
       ),
+    )
+    .build();
+}
+
+/**
+ * Show sidebar with settings and logout option
+ */
+export function showSidebar(): GoogleAppsScript.Card_Service.Card[] {
+  const accessToken = getAccessToken();
+  let user = null;
+
+  if (accessToken) {
+    const client = new GitHubAPIClient(accessToken);
+    user = client.fetchAuthenticatedUser();
+  }
+
+  const authUrl = getAuthorizationUrl();
+  return [createSettingsSidebar(user, authUrl)];
+}
+
+/**
+ * Handle logout action
+ */
+export function handleLogout(): GoogleAppsScript.Card_Service.ActionResponse {
+  resetAuth();
+
+  const authUrl = getAuthorizationUrl();
+
+  // Return an action response that reloads the sidebar
+  return CardService.newActionResponseBuilder()
+    .setNavigation(
+      CardService.newNavigation().updateCard(
+        createSettingsSidebar(null, authUrl),
+      ),
+    )
+    .setNotification(
+      CardService.newNotification().setText("Successfully logged out"),
     )
     .build();
 }

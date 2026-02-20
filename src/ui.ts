@@ -381,3 +381,70 @@ export function createErrorCard(
     )
     .build();
 }
+
+/**
+ * Create a sidebar card for user settings and logout
+ */
+export function createSettingsSidebar(
+  user: GitHubUser | null,
+  authorizationUrl: string,
+): GoogleAppsScript.Card_Service.Card {
+  const cardBuilder = CardService.newCardBuilder().setHeader(
+    CardService.newCardHeader()
+      .setTitle("GitHub Smart Chips")
+      .setSubtitle("Settings")
+      .setImageUrl(GITHUB_LOGO),
+  );
+
+  if (user) {
+    // User is logged in
+    const userSection = CardService.newCardSection();
+
+    userSection.addWidget(
+      CardService.newKeyValue()
+        .setTopLabel("Logged in as")
+        .setContent(`@${user.login}`),
+    );
+
+    if (user.name) {
+      userSection.addWidget(
+        CardService.newKeyValue().setTopLabel("Name").setContent(user.name),
+      );
+    }
+
+    cardBuilder.addSection(userSection);
+
+    // Add logout button
+    cardBuilder.addSection(
+      CardService.newCardSection().addWidget(
+        CardService.newTextButton()
+          .setText("Logout")
+          .setOnClickAction(
+            CardService.newAction().setFunctionName("handleLogout"),
+          ),
+      ),
+    );
+  } else {
+    // User is not logged in
+    cardBuilder.addSection(
+      CardService.newCardSection()
+        .addWidget(
+          CardService.newTextParagraph().setText(
+            "You are not currently logged in. To access private repositories, please authorize this add-on.",
+          ),
+        )
+        .addWidget(
+          CardService.newTextButton()
+            .setText("Authorize GitHub Access")
+            .setOpenLink(
+              CardService.newOpenLink()
+                .setUrl(authorizationUrl)
+                .setOpenAs(CardService.OpenAs.OVERLAY)
+                .setOnClose(CardService.OnClose.RELOAD),
+            ),
+        ),
+    );
+  }
+
+  return cardBuilder.build();
+}
