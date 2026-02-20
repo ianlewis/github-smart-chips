@@ -166,6 +166,38 @@ describe("parseGitHubURL", () => {
     expect(result?.owner).toBe("owner");
     expect(result?.repo).toBe("repo");
   });
+
+  it("should parse GitHub organization project URLs", () => {
+    const url = "https://github.com/orgs/myorg/projects/5";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("myorg");
+    expect(result?.org).toBe("myorg");
+    expect(result?.number).toBe(5);
+    expect(result?.type).toBe("project");
+  });
+
+  it("should parse GitHub user project URLs", () => {
+    const url = "https://github.com/users/username/projects/3";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.owner).toBe("username");
+    expect(result?.org).toBeUndefined();
+    expect(result?.number).toBe(3);
+    expect(result?.type).toBe("project");
+  });
+
+  it("should prioritize project URLs over repository URLs", () => {
+    const url = "https://github.com/orgs/myorg/projects/1";
+    const result = parseGitHubURL(url);
+
+    expect(result).not.toBeNull();
+    expect(result?.type).toBe("project");
+    expect(result?.owner).toBe("myorg");
+    expect(result?.number).toBe(1);
+  });
 });
 
 describe("GitHubAPIClient", () => {
@@ -594,6 +626,123 @@ describe("GitHubAPIClient", () => {
       });
 
       const result = client.fetchAuthenticatedUser();
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe("fetchProject", () => {
+    it("should fetch organization project data successfully", () => {
+      const mockProject = {
+        number: 5,
+        title: "My Project",
+        shortDescription: "A test project",
+        closed: false,
+        public: true,
+        createdAt: "2023-01-01T00:00:00Z",
+        updatedAt: "2023-06-01T00:00:00Z",
+        url: "https://github.com/orgs/testorg/projects/5",
+      };
+
+      const mockResponse = {
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            data: {
+              organization: {
+                projectV2: mockProject,
+              },
+            },
+          }),
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchProject("testorg", 5, true);
+
+      expect(result).toEqual(mockProject);
+      expect(mockUrlFetch).toHaveBeenCalledWith(
+        "https://api.github.com/graphql",
+        expect.objectContaining({
+          method: "post",
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-token",
+            "Content-Type": "application/json",
+          }),
+        }),
+      );
+    });
+
+    it("should fetch user project data successfully", () => {
+      const mockProject = {
+        number: 3,
+        title: "Personal Project",
+        shortDescription: "My personal project",
+        closed: false,
+        public: false,
+        createdAt: "2023-02-01T00:00:00Z",
+        updatedAt: "2023-07-01T00:00:00Z",
+        url: "https://github.com/users/testuser/projects/3",
+      };
+
+      const mockResponse = {
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            data: {
+              user: {
+                projectV2: mockProject,
+              },
+            },
+          }),
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchProject("testuser", 3, false);
+
+      expect(result).toEqual(mockProject);
+    });
+
+    it("should return null when API returns error", () => {
+      const mockResponse = {
+        getResponseCode: () => 404,
+        getContentText: () => "Not Found",
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchProject("testorg", 5, true);
+
+      expect(result).toBeNull();
+    });
+
+    it("should return null when GraphQL returns errors", () => {
+      const mockResponse = {
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            errors: [{ message: "Project not found" }],
+          }),
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockUrlFetch.mockReturnValue(mockResponse as any);
+
+      const result = client.fetchProject("testorg", 5, true);
+
+      expect(result).toBeNull();
+    });
+
+    it("should handle API fetch exceptions", () => {
+      mockUrlFetch.mockImplementation(() => {
+        throw new Error("Network error");
+      });
+
+      const result = client.fetchProject("testorg", 5, true);
 
       expect(result).toBeNull();
     });

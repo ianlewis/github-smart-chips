@@ -17,6 +17,7 @@ import {
   type GitHubIssue,
   type GitHubPullRequest,
   type GitHubUser,
+  type GitHubProject,
 } from "./types.js";
 
 import { relativeTime, trimString } from "./utils.js";
@@ -348,6 +349,81 @@ export function createUserCard(
       CardService.newTextButton()
         .setText("View Profile on GitHub")
         .setOpenLink(CardService.newOpenLink().setUrl(data.html_url)),
+    ),
+  );
+
+  return cardBuilder.build();
+}
+
+/**
+ * Create a preview card for a GitHub project
+ */
+export function createProjectCard(
+  data: GitHubProject,
+  owner: string,
+  isOrg: boolean,
+): GoogleAppsScript.Card_Service.Card {
+  const subtitle = data.shortDescription || "GitHub Project";
+
+  // Create state indicator with appropriate icon
+  const stateIcon = data.closed ? "🔴" : "🟢";
+  const stateText = data.closed ? "Closed" : "Open";
+
+  // Format the updated date
+  const updatedDate = new Date(data.updatedAt);
+  const now = new Date();
+  const updatedText = `updated ${relativeTime(now, updatedDate)}`;
+
+  const cardBuilder = CardService.newCardBuilder()
+    .setHeader(
+      CardService.newCardHeader()
+        .setTitle(data.title)
+        .setSubtitle(subtitle)
+        .setImageUrl(GITHUB_LOGO),
+    )
+    .addSection(
+      CardService.newCardSection()
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Project")
+            .setContent(`${stateIcon} #${data.number} • ${stateText}`),
+        )
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Owner")
+            .setContent(`${isOrg ? "Organization" : "User"}: ${owner}`),
+        )
+        .addWidget(
+          CardService.newKeyValue()
+            .setTopLabel("Visibility")
+            .setContent(data.public ? "🌐 Public" : "🔒 Private"),
+        ),
+    );
+
+  // Add dates section
+  const createdDate = new Date(data.createdAt);
+  const createdText = `Created ${relativeTime(now, createdDate)}`;
+
+  cardBuilder.addSection(
+    CardService.newCardSection()
+      .addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Created")
+          .setContent(createdText),
+      )
+      .addWidget(
+        CardService.newKeyValue()
+          .setTopLabel("Last Updated")
+          .setContent(updatedText),
+      ),
+  );
+
+  // Add action button to view on GitHub
+  cardBuilder.addSection(
+    CardService.newCardSection().addWidget(
+      CardService.newTextButton()
+        .setText("View Project on GitHub")
+        .setOpenLink(CardService.newOpenLink().setUrl(data.url)),
     ),
   );
 

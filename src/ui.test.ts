@@ -18,6 +18,7 @@ import {
   createPullRequestCard,
   createRepositoryCard,
   createUserCard,
+  createProjectCard,
   createSettingsSidebar,
 } from "./ui.js";
 import {
@@ -25,6 +26,7 @@ import {
   type GitHubIssue,
   type GitHubPullRequest,
   type GitHubUser,
+  type GitHubProject,
 } from "./types.js";
 import { GITHUB_LOGO } from "./logos.js";
 
@@ -557,6 +559,71 @@ describe("createUserCard", () => {
     createUserCard(data);
 
     expect(mockCardHeader.setTitle).toHaveBeenCalledWith("username");
+  });
+});
+
+describe("createProjectCard", () => {
+  it("should create a card for an open organization project", () => {
+    const data: GitHubProject = {
+      number: 5,
+      title: "Test Project",
+      shortDescription: "A test project",
+      closed: false,
+      public: true,
+      createdAt: "2023-01-01T00:00:00Z",
+      updatedAt: "2023-06-01T00:00:00Z",
+      url: "https://github.com/orgs/testorg/projects/5",
+    };
+
+    createProjectCard(data, "testorg", true);
+
+    expect(CardService.newCardBuilder).toHaveBeenCalled();
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("Test Project");
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith("A test project");
+    expect(mockCardHeader.setImageUrl).toHaveBeenCalledWith(GITHUB_LOGO);
+    expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+
+  it("should create a card for a closed user project", () => {
+    const data: GitHubProject = {
+      number: 3,
+      title: "Personal Project",
+      shortDescription: "My personal project",
+      closed: true,
+      public: false,
+      createdAt: "2023-02-01T00:00:00Z",
+      updatedAt: "2023-07-01T00:00:00Z",
+      url: "https://github.com/users/testuser/projects/3",
+    };
+
+    createProjectCard(data, "testuser", false);
+
+    expect(CardService.newCardBuilder).toHaveBeenCalled();
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("Personal Project");
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
+      "My personal project",
+    );
+    expect(mockCardHeader.setImageUrl).toHaveBeenCalledWith(GITHUB_LOGO);
+    expect(mockCardBuilder.build).toHaveBeenCalled();
+  });
+
+  it("should create a card for a project with no description", () => {
+    const data: GitHubProject = {
+      number: 1,
+      title: "Untitled Project",
+      closed: false,
+      public: true,
+      createdAt: "2023-03-01T00:00:00Z",
+      updatedAt: "2023-08-01T00:00:00Z",
+      url: "https://github.com/orgs/myorg/projects/1",
+    };
+
+    createProjectCard(data, "myorg", true);
+
+    expect(CardService.newCardBuilder).toHaveBeenCalled();
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("Untitled Project");
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith("GitHub Project");
+    expect(mockCardBuilder.build).toHaveBeenCalled();
   });
 });
 
