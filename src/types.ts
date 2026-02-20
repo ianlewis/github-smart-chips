@@ -92,11 +92,26 @@ export interface GitHubRepository {
 }
 
 /**
+ * GitHub project data
+ */
+export interface GitHubProject {
+  number: number;
+  title: string;
+  shortDescription?: string;
+  closed: boolean;
+  public: boolean;
+  createdAt: string;
+  updatedAt: string;
+  url: string;
+}
+
+/**
  * Parsed GitHub URL information
  */
 export interface GitHubURLInfo {
   owner: string;
   repo?: string;
   number?: number;
-  type: "repository" | "issue" | "pull_request" | "user";
+  org?: string;
+  type: "repository" | "issue" | "pull_request" | "user" | "project";
 }

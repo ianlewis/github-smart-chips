@@ -19,6 +19,7 @@ import {
   createIssueCard,
   createPullRequestCard,
   createUserCard,
+  createProjectCard,
   createErrorCard,
   createSettingsSidebar,
 } from "./ui.js";
@@ -98,6 +99,20 @@ export function onLinkPreview(
         break;
       }
       card = createUserCard(user);
+      break;
+    }
+    case "project": {
+      if (urlInfo.number) {
+        const project = client.fetchProject(
+          urlInfo.owner,
+          urlInfo.number,
+          !!urlInfo.org,
+        );
+        if (!project) {
+          break;
+        }
+        card = createProjectCard(project, urlInfo.owner, !!urlInfo.org);
+      }
       break;
     }
   }

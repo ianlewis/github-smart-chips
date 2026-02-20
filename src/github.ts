@@ -17,6 +17,7 @@ import {
   type GitHubIssue,
   type GitHubPullRequest,
   type GitHubUser,
+  type GitHubProject,
   type GitHubURLInfo,
 } from "./types.js";
 
@@ -26,6 +27,8 @@ import {
 export function parseGitHubURL(url: string): GitHubURLInfo | null {
   const issuePattern = /github\.com\/([^/]+)\/([^/]+)\/issues\/(\d+)/;
   const pullPattern = /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
+  const orgProjectPattern = /github\.com\/orgs\/([^/]+)\/projects\/(\d+)/;
+  const userProjectPattern = /github\.com\/users\/([^/]+)\/projects\/(\d+)/;
   const repoPattern =
     /github\.com\/([^/]+)\/([^/]+)(\/(tree|blob)\/([^/]+)\/?|\/?$)/;
   const userPattern = /github\.com\/([^/]+)\/?$/;
@@ -47,6 +50,25 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
       repo: match[2],
       number: parseInt(match[3], 10),
       type: "issue",
+    };
+  }
+
+  match = url.match(orgProjectPattern);
+  if (match) {
+    return {
+      owner: match[1],
+      org: match[1],
+      number: parseInt(match[2], 10),
+      type: "project",
+    };
+  }
+
+  match = url.match(userProjectPattern);
+  if (match) {
+    return {
+      owner: match[1],
+      number: parseInt(match[2], 10),
+      type: "project",
     };
   }
 
@@ -238,6 +260,75 @@ export class GitHubAPIClient {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error fetching authenticated user data: ${error}`);
+      return null;
+    }
+  }
+
+  /**
+   * Fetch project details using GraphQL API
+   */
+  fetchProject(
+    owner: string,
+    number: number,
+    isOrg: boolean,
+  ): GitHubProject | null {
+    const apiUrl = "https://api.github.com/graphql";
+
+    const ownerType = isOrg ? "organization" : "user";
+    const query = `
+      query {
+        ${ownerType}(login: "${owner}") {
+          projectV2(number: ${number}) {
+            number
+            title
+            shortDescription
+            closed
+            public
+            createdAt
+            updatedAt
+            url
+          }
+        }
+      }
+    `;
+
+    try {
+      const response = UrlFetchApp.fetch(apiUrl, {
+        method: "post",
+        headers: {
+          ...this.headers(),
+          "Content-Type": "application/json",
+        },
+        payload: JSON.stringify({ query }),
+        muteHttpExceptions: true,
+      });
+
+      if (response.getResponseCode() !== 200) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `GitHub API error: ${response.getResponseCode()} - ${response.getContentText()}`,
+        );
+        return null;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = JSON.parse(response.getContentText()) as any;
+
+      if (result.errors) {
+        // eslint-disable-next-line no-console
+        console.error(`GitHub GraphQL errors: ${JSON.stringify(result.errors)}`);
+        return null;
+      }
+
+      const projectData = result.data?.[ownerType]?.projectV2;
+      if (!projectData) {
+        return null;
+      }
+
+      return projectData as GitHubProject;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`Error fetching GitHub project data: ${error}`);
       return null;
     }
   }
