@@ -316,7 +316,9 @@ export class GitHubAPIClient {
 
       if (result.errors) {
         // eslint-disable-next-line no-console
-        console.error(`GitHub GraphQL errors: ${JSON.stringify(result.errors)}`);
+        console.error(
+          `GitHub GraphQL errors: ${JSON.stringify(result.errors)}`,
+        );
         return null;
       }
 
