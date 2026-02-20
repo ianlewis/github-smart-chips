@@ -106,7 +106,9 @@ describe("getGitHubService", () => {
     expect(mockOAuth2Service.setPropertyStore).toHaveBeenCalledWith(
       mockUserProps,
     );
-    expect(mockOAuth2Service.setScope).toHaveBeenCalledWith("repo");
+    expect(mockOAuth2Service.setScope).toHaveBeenCalledWith(
+      "repo read:project",
+    );
     expect(service).toBe(mockOAuth2Service);
   });
 
