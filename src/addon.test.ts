@@ -337,6 +337,92 @@ describe("onLinkPreview", () => {
     });
   });
 
+  describe("Project handling", () => {
+    it("should handle organization project URLs successfully", () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).UrlFetchApp.fetch.mockReturnValueOnce({
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            data: {
+              organization: {
+                projectV2: {
+                  number: 5,
+                  title: "Test Project",
+                  shortDescription: "A test project",
+                  closed: false,
+                  public: true,
+                  createdAt: "2023-01-01T00:00:00Z",
+                  updatedAt: "2023-06-01T00:00:00Z",
+                  url: "https://github.com/orgs/testorg/projects/5",
+                },
+              },
+            },
+          }),
+      });
+
+      const event = {
+        docs: {
+          matchedUrl: {
+            url: "https://github.com/orgs/testorg/projects/5",
+          },
+        },
+      };
+
+      const result = onLinkPreview(event);
+
+      // Test that the function returns a card with the expected structure
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((result as any[])[0]).toHaveProperty("id");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((result as any[])[0].id).toBe("mock-card");
+    });
+
+    it("should handle user project URLs successfully", () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).UrlFetchApp.fetch.mockReturnValueOnce({
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            data: {
+              user: {
+                projectV2: {
+                  number: 3,
+                  title: "Personal Project",
+                  shortDescription: "My personal project",
+                  closed: false,
+                  public: false,
+                  createdAt: "2023-02-01T00:00:00Z",
+                  updatedAt: "2023-07-01T00:00:00Z",
+                  url: "https://github.com/users/testuser/projects/3",
+                },
+              },
+            },
+          }),
+      });
+
+      const event = {
+        docs: {
+          matchedUrl: {
+            url: "https://github.com/users/testuser/projects/3",
+          },
+        },
+      };
+
+      const result = onLinkPreview(event);
+
+      // Test that the function returns a card with the expected structure
+      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(1);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((result as any[])[0]).toHaveProperty("id");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((result as any[])[0].id).toBe("mock-card");
+    });
+  });
+
   describe("Authentication handling", () => {
     it("should return authorization card when no token and no data", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
