@@ -182,10 +182,7 @@ export function showSidebar(): GoogleAppsScript.Card_Service.Card[] {
 /**
  * Handle logout action
  */
-export function handleLogout(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _event?: any,
-): GoogleAppsScript.Card_Service.ActionResponse {
+export function handleLogout(): GoogleAppsScript.Card_Service.ActionResponse {
   resetAuth();
 
   const authUrl = getAuthorizationUrl();
