@@ -87,6 +87,8 @@ The following GitHub links will be supported:
 - Issue links (e.g., `https://github.com/owner/repo/issues/123`)
 - Pull Request links (e.g., `https://github.com/owner/repo/pull/123`)
 - User profile links (e.g., `https://github.com/username`)
+- Organization project links (e.g., `https://github.com/orgs/org-name/projects/123`)
+- User project links (e.g., `https://github.com/users/username/projects/123`)
 
 ### User Interface (UI)
 
@@ -125,6 +127,9 @@ All chips will include a GitHub Octocat icon.
 - **User Profile Link Smart Chip**: The smart chip will display the user's
   username and name in the format `username (name)`.
   e.g. `ianlewis (Ian Lewis)`
+- **Project Link Smart Chip**: The smart chip will display the project owner
+  and title.
+  e.g. `octocat/My Project`
 
 #### Card Details
 
@@ -210,6 +215,19 @@ Each link type will have specific details displayed in the preview card:
     - Account creation date (displayed as relative time, e.g. "Joined 5 years
       ago").
 
+- **Project Preview Card**: The preview card will display a card with GitHub
+  project information that resembles GitHub's own project overview.
+
+    The card will include the following information:
+    - The project title with a link to the project.
+    - The project owner (organization or user).
+    - Project number.
+    - Project state (open/closed).
+    - Project visibility (public/private).
+    - Project description.
+    - The date the project was created.
+    - The date the project was last updated.
+
 ### GitHub API Client
 
 The GitHub API client will be responsible for making authenticated requests
@@ -221,6 +239,7 @@ functions to:
 - Fetch issue details.
 - Fetch pull request details.
 - Fetch user profile details.
+- Fetch project details (using GraphQL API for GitHub Projects v2).
 
 The client should be designed as a reusable class (`GitHubAPIClient`) in a
 JavaScript module. The class constructor should take an OAuth2 access token as a
@@ -234,6 +253,7 @@ objects returned by GitHub.
 - [Get an issue](https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#get-an-issue)
 - [Get a pull request](https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request)
 - [Get a user](https://docs.github.com/en/rest/users/users?apiVersion=2022-11-28#get-a-user)
+- [Get a project](https://docs.github.com/en/graphql/reference/queries#node) (using GraphQL API for Projects v2)
 
 When the API returns errors, they should be returned to the caller so that it
 can handle them appropriately (e.g., displaying an authentication or error

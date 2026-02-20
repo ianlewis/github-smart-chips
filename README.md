@@ -6,8 +6,8 @@
 
 A Google Workspace™︎ add-on that provides smart chips with preview links for
 GitHub issues and pull requests. This add-on displays GitHub repository, user,
-issue, and pull request information directly in Google Docs™︎, Google Sheets™︎,
-and Google Slides™︎.
+issue, pull request, and project information directly in Google Docs™︎, Google
+Sheets™︎, and Google Slides™︎.
 
 ![A preview link for a GitHub issue with preview popup](./docs/assets/images/screenshots/issue.png)
 
@@ -24,6 +24,8 @@ and Google Slides™︎.
     - Repository: `https://github.com/{owner}/{repo}`
     - Issue: `https://github.com/{owner}/{repo}/issues/{number}`
     - Pull Request: `https://github.com/{owner}/{repo}/pull/{number}`
+    - Organization Project: `https://github.com/orgs/{org}/projects/{number}`
+    - User Project: `https://github.com/users/{user}/projects/{number}`
 
 ## Usage
 

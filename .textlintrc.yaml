@@ -74,6 +74,7 @@ rules:
       - "/\\brepo\\b/g"
       - "/\\bnpm\\b/g"
       - "/\\bclasp\\b/g"
+      - "/\\bGraphQL\\b/g"
       - "/\\bGITHUB_CLIENT_(ID|SECRET)\\b/g"
       - "/\\bappsscript\\.json\\b/g"
       - "/\\bhttps?\\b/g"
