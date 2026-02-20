@@ -88,7 +88,7 @@ repository data. Follow these steps to create one:
 6. Click **"Generate a new client secret"** and copy the **Client Secret**
    immediately (it won't be shown again).
 
-## Configure Apps Script Project
+### Configure Apps Script Project
 
 1. Go to your Apps Script project in the Google Apps Script editor.
 
