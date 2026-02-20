@@ -55,6 +55,12 @@ cd github-smart-chips
     make script
     ```
 
+    Be sure to commit the changes to `.clasp.json` to your repository fork.
+
+    ```bash
+    git commit .clasp.json -m "chore: update Apps Script project"
+    ```
+
 3. Build and Deploy the Code
 
     This will build the project and push the code to your Apps Script project.
