@@ -35,7 +35,7 @@ REPO_ROOT := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 REPO_NAME := $(shell basename "$(REPO_ROOT)")
 
 # renovate: datasource=github-releases depName=aquaproj/aqua versioning=loose
-AQUA_VERSION ?= v2.56.6
+AQUA_VERSION ?= v2.56.7
 AQUA_REPO := github.com/aquaproj/aqua
 AQUA_CHECKSUM.Linux.x86_64 = f6ffd22e02e6d454ab2699a03b70b7f9b8ae5aaa0d84405592db3c6a3c48c19a
 AQUA_CHECKSUM.Linux.arm64 = 47e098b62d1794956026ba4bd56be3fa0772074576747463b03ccea4825952d6
