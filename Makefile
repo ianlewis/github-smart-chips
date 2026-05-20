@@ -14,7 +14,7 @@
 
 # Set the initial shell so we can determine extra options.
 SHELL := /usr/bin/env bash -ueo pipefail
-DEBUG_LOGGING ?= $(shell if [[ "${GITHUB_ACTIONS}" == "true" ]] && [[ -n "${RUNNER_DEBUG}" || "${ACTIONS_RUNNER_DEBUG}" == "true" || "${ACTIONS_STEP_DEBUG}" == "true" ]]; then echo "true"; else echo ""; fi)
+DEBUG_LOGGING ?= $(shell if [[ "$(GITHUB_ACTIONS)" == "true" ]] && [[ -n "$(RUNNER_DEBUG)" || "$(ACTIONS_RUNNER_DEBUG)" == "true" || "$(ACTIONS_STEP_DEBUG)" == "true" ]]; then echo "true"; else echo ""; fi)
 BASH_OPTIONS := $(shell if [ "$(DEBUG_LOGGING)" == "true" ]; then echo "-x"; else echo ""; fi)
 
 # Add extra options for debugging.
@@ -30,16 +30,16 @@ kernel.Linux := linux
 kernel.Darwin := darwin
 kernel := $(kernel.$(uname_s))
 
-OUTPUT_FORMAT ?= $(shell if [ "${GITHUB_ACTIONS}" == "true" ]; then echo "github"; else echo ""; fi)
+OUTPUT_FORMAT ?= $(shell if [ "$(GITHUB_ACTIONS)" == "true" ]; then echo "github"; else echo ""; fi)
 REPO_ROOT := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 REPO_NAME := $(shell basename "$(REPO_ROOT)")
 
 # renovate: datasource=github-releases depName=aquaproj/aqua versioning=loose
-AQUA_VERSION ?= v2.56.6
+AQUA_VERSION ?= v2.58.0
 AQUA_REPO := github.com/aquaproj/aqua
-AQUA_CHECKSUM.linux.amd64 = f6ffd22e02e6d454ab2699a03b70b7f9b8ae5aaa0d84405592db3c6a3c48c19a
-AQUA_CHECKSUM.linux.arm64 = 47e098b62d1794956026ba4bd56be3fa0772074576747463b03ccea4825952d6
-AQUA_CHECKSUM.darwin.arm64 = 32b2796f81d88d24525a2344b25d9561c8405c327be9b67392bf611ad1a9809f
+AQUA_CHECKSUM.linux.amd64 := e4db66fca1cf9061d18ff1c0abc1cb68ada30e1e2500438ec8a20b72661111be
+AQUA_CHECKSUM.linux.arm64 := 2e7fe48e181eb6e310653124562b5b30569f1a29b781da6ee82d902ded25c6dc
+AQUA_CHECKSUM.darwin.arm64 := 2d6a5dbdfac17a9caa256f87104b9ce716dcd6eb8cbe1c248adb63d24101db21
 AQUA_CHECKSUM ?= $(AQUA_CHECKSUM.$(kernel).$(arch))
 AQUA_URL := https://$(AQUA_REPO)/releases/download/$(AQUA_VERSION)/aqua_$(kernel)_$(arch).tar.gz
 export AQUA_ROOT_DIR = $(REPO_ROOT)/.aqua
@@ -92,6 +92,17 @@ help: ## Print all Makefile targets (this message).
 				} \
 			}'
 
+$(REPO_ROOT)/.aqua-checksums.json: $(REPO_ROOT)/.aqua.yaml $(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION)/aqua
+	@# bash \
+	loglevel="info"; \
+	if [ -n "$(DEBUG_LOGGING)" ]; then \
+		loglevel="debug"; \
+	fi; \
+	$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION)/aqua \
+		--config "$(REPO_ROOT)/.aqua.yaml" \
+		--log-level "$${loglevel}" \
+		update-checksum
+
 package-lock.json: package.json $(AQUA_ROOT_DIR)/.installed
 	@# bash \
 	loglevel="notice"; \
@@ -121,9 +132,9 @@ package-lock.json: package.json $(AQUA_ROOT_DIR)/.installed
 			--package-lock-only \
 			--no-audit \
 			--no-fund; \
-	fi; \
+	fi
 
-node_modules/.installed: package-lock.json
+node_modules/.installed: package.json | package-lock.json
 	@# bash \
 	loglevel="silent"; \
 	if [ -n "$(DEBUG_LOGGING)" ]; then \
@@ -137,29 +148,28 @@ node_modules/.installed: package-lock.json
 	@# bash \
 	python -m venv .venv
 
-.venv/.installed: requirements.txt requirements-dev.txt .venv/bin/activate
+.venv/.installed: requirements-dev.txt .venv/bin/activate
 	@# bash \
 	$(REPO_ROOT)/.venv/bin/pip install -r $< --require-hashes; \
-	$(REPO_ROOT)/.venv/bin/pip install -r $(word 2,$^) --require-hashes; \
 	touch $@
 
-.bin/aqua-$(AQUA_VERSION)/aqua:
+$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION)/aqua:
 	@# bash \
-	mkdir -p .bin/aqua-$(AQUA_VERSION); \
+	mkdir -p $(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION); \
 	tempfile=$$($(MKTEMP) --suffix=".aqua-$(AQUA_VERSION).tar.gz"); \
 	curl -sSLo "$${tempfile}" "$(AQUA_URL)"; \
 	echo "$(AQUA_CHECKSUM)  $${tempfile}" | shasum -a 256 -c; \
-	tar -x -C .bin/aqua-$(AQUA_VERSION) -f "$${tempfile}"
+	tar -x -C $(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION) -f "$${tempfile}"
 
-$(AQUA_ROOT_DIR)/.installed: .aqua.yaml .bin/aqua-$(AQUA_VERSION)/aqua
+$(AQUA_ROOT_DIR)/.installed: $(REPO_ROOT)/.aqua.yaml $(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION)/aqua | $(REPO_ROOT)/.aqua-checksums.json
 	@# bash \
 	loglevel="info"; \
 	if [ -n "$(DEBUG_LOGGING)" ]; then \
 		loglevel="debug"; \
 	fi; \
 	$(REPO_ROOT)/.bin/aqua-$(AQUA_VERSION)/aqua \
+		--config "$(REPO_ROOT)/.aqua.yaml" \
 		--log-level "$${loglevel}" \
-		--config .aqua.yaml \
 		install; \
 	touch $@
 
@@ -457,9 +467,8 @@ checkmake: $(AQUA_ROOT_DIR)/.installed ## Runs the checkmake linter.
 		exit 0; \
 	fi; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		# TODO: Remove newline from the format string after updating checkmake. \
 		checkmake \
-			--format '::error file={{.FileName}},line={{.LineNumber}}::{{.Rule}}: {{.Violation}}'$$'\n' \
+			--format '::error file={{.FileName}},line={{.LineNumber}}::{{.Rule}}: {{.Violation}}' \
 			$${files}; \
 	else \
 		checkmake $${files}; \
@@ -481,16 +490,15 @@ commitlint: node_modules/.installed ## Run commitlint linter.
 		fi; \
 	fi; \
 	if [ "$${commitlint_to}" == "" ]; then \
-		# if head is on the commitlint_from branch, then we will lint the \
-		# last commit by default. \
-		current_branch=$$(git rev-parse --abbrev-ref HEAD); \
+		# If upstream of HEAD is on the commitlint_from branch, then we will \
+		# lint the last commit by default. \
+		current_branch=$$(git rev-parse --abbrev-ref @{u}); \
 		if [ "$${commitlint_from}" == "$${current_branch}" ]; then \
 			commitlint_from="HEAD~1"; \
 		fi; \
 		commitlint_to="HEAD"; \
 	fi; \
 	$(REPO_ROOT)/node_modules/.bin/commitlint \
-		--config commitlint.config.mjs \
 		--from "$${commitlint_from}" \
 		--to "$${commitlint_to}" \
 		--verbose \
@@ -595,6 +603,9 @@ format-check: ## Check that files are properly formatted.
 .PHONY: markdownlint
 markdownlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the markdownlint linter.
 	@# bash \
+	# NOTE: Issue and PR templates are handled specially so we can disable \
+	# MD041/first-line-heading/first-line-h1 without adding an ugly html comment \
+	# at the top of the file. \
 	files=$$( \
 		git ls-files --deduplicate \
 			'*.md' \
@@ -624,27 +635,7 @@ textlint: node_modules/.installed $(AQUA_ROOT_DIR)/.installed ## Runs the textli
 	if [ "$${files}" == "" ]; then \
 		exit 0; \
 	fi; \
-	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
-		exit_code=0; \
-		while IFS="" read -r p && [ -n "$$p" ]; do \
-			filePath=$$(echo "$$p" | jq -cr '.filePath // empty'); \
-			file=$$(realpath --relative-to="." "$${filePath}"); \
-			while IFS="" read -r m && [ -n "$$m" ]; do \
-				line=$$(echo "$$m" | jq -cr '.loc.start.line // empty'); \
-				endline=$$(echo "$$m" | jq -cr '.loc.end.line // empty'); \
-				col=$$(echo "$${m}" | jq -cr '.loc.start.column // empty'); \
-				endcol=$$(echo "$${m}" | jq -cr '.loc.end.column // empty'); \
-				message=$$(echo "$$m" | jq -cr '.message // empty'); \
-				exit_code=1; \
-				echo "::error file=$${file},line=$${line},endLine=$${endline},col=$${col},endColumn=$${endcol}::$${message}"; \
-			done <<<"$$(echo "$$p" | jq -cr '.messages[] // empty')"; \
-		done <<< "$$($(REPO_ROOT)/node_modules/.bin/textlint -c .textlintrc.yaml --format json $${files} 2>&1 | jq -c '.[]')"; \
-		exit "$${exit_code}"; \
-	else \
-		$(REPO_ROOT)/node_modules/.bin/textlint \
-			--config .textlintrc.yaml \
-			$${files}; \
-	fi
+	$(REPO_ROOT)/node_modules/.bin/textlint $${files}
 
 .PHONY: yamllint
 yamllint: .venv/.installed ## Runs the yamllint linter.
@@ -664,7 +655,6 @@ yamllint: .venv/.installed ## Runs the yamllint linter.
 	fi; \
 	$(REPO_ROOT)/.venv/bin/yamllint \
 		--strict \
-		--config-file .yamllint.yaml \
 		--format "$${format}" \
 		$${files}
 
@@ -684,14 +674,12 @@ zizmor: .venv/.installed ## Runs the zizmor linter.
 	fi; \
 	if [ "$(OUTPUT_FORMAT)" == "github" ]; then \
 		$(REPO_ROOT)/.venv/bin/zizmor \
-			--config .zizmor.yml \
 			--quiet \
 			--pedantic \
 			--format sarif \
 			$${files} > zizmor.sarif.json; \
 	fi; \
 	$(REPO_ROOT)/.venv/bin/zizmor \
-		--config .zizmor.yml \
 		--quiet \
 		--pedantic \
 		--format plain \
@@ -699,6 +687,9 @@ zizmor: .venv/.installed ## Runs the zizmor linter.
 
 ## Maintenance
 #####################################################################
+
+.PHONY: update-lockfiles
+update-lockfiles: $(REPO_ROOT)/.aqua-checksums.json package-lock.json ## Update lockfiles.
 
 .PHONY: todos
 todos: $(AQUA_ROOT_DIR)/.installed ## Print outstanding TODOs.
