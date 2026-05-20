@@ -69,6 +69,18 @@ cd github-smart-chips
     make push
     ```
 
+### Configure Apps Script Project
+
+1. Go to your Apps Script project in the Google Apps Script editor.
+
+    ```bash
+    make goto-apps-script
+    ```
+
+2. Click the gear icon (**Project Settings**).
+3. Copy the **Script ID** value. You will need it to set the GitHub OAuth App
+   callback URL.
+
 ### Create a GitHub OAuth App
 
 The add-on requires a GitHub OAuth App to authenticate users and access
@@ -81,29 +93,23 @@ repository data. Follow these steps to create one:
     - **Homepage URL**: The URL of your fork or the original repository.
     - **Authorization callback URL**:
       `https://script.google.com/macros/d/{SCRIPT_ID}/usercallback`
-        - Replace `{SCRIPT_ID}` with the Apps Script Script ID.
+        - Replace `{SCRIPT_ID}` with the Apps Script **Script ID**.
     - **Enable Device Flow**: Leave unchecked.
 4. Click **"Register application"**.
 5. Copy the **Client ID**.
 6. Click **"Generate a new client secret"** and copy the **Client Secret**
    immediately (it won't be shown again).
 
-### Configure Apps Script Project
+### Add OAuth Credentials to Apps Script
 
-1. Go to your Apps Script project in the Google Apps Script editor.
-
-    ```bash
-    make goto-apps-script
-    ```
-
-2. Click the gear icon (Project Settings).
-3. Scroll to **"Script Properties"**.
-4. Click **"Add script property"** and add both:
+1. In your Apps Script project, click the gear icon (**Project Settings**).
+2. Scroll to **"Script Properties"**.
+3. Click **"Add script property"** and add both:
     - Property: `GITHUB_CLIENT_ID`, Value: Your GitHub OAuth App Client ID
     - Property: `GITHUB_CLIENT_SECRET`, Value: Your GitHub OAuth App Client
       Secret
-5. Click **"Deploy"** > **"Test deployments"** in the upper right.
-6. Click **"Install"** and grant the necessary permissions when prompted.
+4. Click **"Deploy"** > **"Test deployments"** in the upper right.
+5. Click **"Install"** and grant the necessary permissions when prompted.
 
 ### Create a Test Deployment
 
