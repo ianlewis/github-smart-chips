@@ -22,5 +22,5 @@
     "strictNullChecks": true,
     "target": "ES2022"
   },
-  "isolatedModules": true, // isolatedModules is required by jest-ts
+  "isolatedModules": true // isolatedModules is required by jest-ts
 }
