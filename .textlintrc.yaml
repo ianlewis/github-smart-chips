@@ -72,6 +72,8 @@ rules:
       - ":white_check_mark:"
 
       # GitHub Smart Chips specific terms
+      - "/\\bAPIs?\\b/"
+      - "/\\bIAM\\b/" # Identity and Access Management
       - "/\\bOAuth2?\\b/g"
       - "/\\bOctocat\\b/g"
       - "/\\bgithub\\.com\\b/g"
@@ -85,3 +87,5 @@ rules:
       - "/\\bAdd-ons?\\b/g"
       - "/\\badd-on'?s?\\b/g"
       - "/\\.md\\b/g"
+      - "/\\b[Uu]ncheck\\b/g"
+      - "/\\b[Ww]ebhooks?\\b/g"
