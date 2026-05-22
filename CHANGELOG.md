@@ -9,8 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- New/Unreleased changes go here. -->
 
-## [0.1.0] - `YYYY-MM-YY`
+## [1.0.0] - `2026-05-22`
 
 - Initial release
+- Supported features:
+    - **Smart Chips for GitHub Links**: Automatically recognizes GitHub issue
+      and PR URLs.
+    - **Rich Previews**: Displays repository owner, name, issue/PR number,
+      title, and status.
+    - **OAuth Authentication**: Supports private repositories via GitHub OAuth.
+    - **Cross-Platform**: Works in Google Docs™, Sheets™, and Slides™︎.
+    - **Multiple URL Patterns**: Supports various GitHub URLs:
+        - User: `https://github.com/{user/org}`
+        - Repository: `https://github.com/{owner}/{repo}`
+        - Issue: `https://github.com/{owner}/{repo}/issues/{number}`
+        - Pull Request: `https://github.com/{owner}/{repo}/pull/{number}`
+        - Organization Project: `https://github.com/orgs/{org}/projects/{number}`
+        - User Project: `https://github.com/users/{user}/projects/{number}`
 
-[0.1.0]: https://github.com/ianlewis/repo-template/releases/tag/v0.1.0
+[1.0.0]: https://github.com/ianlewis/repo-template/releases/tag/v1.0.0
