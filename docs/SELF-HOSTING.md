@@ -59,9 +59,10 @@ cd github-smart-chips
 
 ### Enable the Apps Script API
 
-1. Follow the instructions in the [Google Apps Script API
-   documentation](https://developers.google.com/apps-script/api/how-tos/enable)
-   to enable the Apps Script API for your Google account.
+1. Open the [Google Apps Script user
+   settings](https://script.google.com/home/usersettings) page and turn on the
+   **Google Apps Script API** for your user account.
+2. This is required for `clasp` authentication (`make login`) to work.
 
 ### Create the Apps Script Project
 
