@@ -211,6 +211,7 @@ script: node_modules/.installed ## Create a new Apps Script script via clasp.
 	fi; \
 	$(RM) -f .clasp.json; \
 	$(REPO_ROOT)/node_modules/.bin/clasp create \
+		--rootDir "dist" \
 		--title "GitHub Smart Chips"; \
 	# Restore the appsscript.json file to avoid committing changes made by
 	# clasp. \
@@ -225,10 +226,7 @@ goto-apps-script: node_modules/.installed ## Open the Apps Script project in the
 .PHONY: push
 push: pack ## Push the latest code to Apps Script.
 	@# bash \
-	( \
-		cd $(REPO_ROOT)/dist; \
-		$(REPO_ROOT)/node_modules/.bin/clasp push --force; \
-	)
+	$(REPO_ROOT)/node_modules/.bin/clasp push --force
 
 .PHONY: version
 version: push ## Create a new Apps Script version.
@@ -242,7 +240,6 @@ version: push ## Create a new Apps Script version.
 			>&2 echo "APPSSCRIPT_DEPLOYMENT_ID is not set."; \
 			exit 1; \
 		fi; \
-		cd $(REPO_ROOT)/dist; \
 		VERSION_NUMBER=$$($(REPO_ROOT)/node_modules/.bin/clasp create-version "${GITHUB_REF_NAME}" | tr -cd '[:digit:]'); \
 		$(REPO_ROOT)/node_modules/.bin/clasp update-deployment \
 			--versionNumber "$${VERSION_NUMBER}" \
