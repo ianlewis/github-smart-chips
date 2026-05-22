@@ -4,7 +4,6 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "outDir": "./lib",
     "skipLibCheck": true // Required due to MimeType conflict between @types/google-apps-script and DOM lib
   },
   "exclude": ["__fixtures__", "__tests__", "coverage", "lib", "node_modules"],
