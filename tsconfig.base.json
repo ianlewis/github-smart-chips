@@ -16,11 +16,14 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
+    "outDir": "./lib",
     "pretty": true,
     "resolveJsonModule": true,
+    "rootDir": "./src",
     "strict": true,
     "strictNullChecks": true,
     "target": "ES2022",
+    "types": ["google-apps-script"],
     "isolatedModules": true // isolatedModules is required by ts-jest
   }
 }
