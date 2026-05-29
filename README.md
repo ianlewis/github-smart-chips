@@ -9,6 +9,11 @@ GitHub issues and pull requests. This add-on displays GitHub repository, user,
 issue, pull request, and project information directly in Google Docs™︎, Google
 Sheets™︎, and Google Slides™︎.
 
+## AI disclosure
+
+- This project uses Copilot for development.
+- All code is reviewed by humans and/or Copilot.
+
 ![A preview link for a GitHub issue with preview popup](./docs/assets/images/screenshots/issue.png)
 
 ## Features
