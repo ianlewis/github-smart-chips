@@ -41,13 +41,34 @@ export function createIssueCard(
   const bodySnippet = trimString(data.body || "", 50);
 
   // Create state indicator with appropriate icon
-  const stateIcon = data.state === "closed" ? "🔴" : "🟢";
+  let stateIcon = "🟢";
+  let stateText = data.state;
+  if (data.state === "closed") {
+    switch (data.state_reason) {
+      case "completed":
+        stateIcon = "🟣";
+        stateText = "completed";
+        break;
+      case "not_planned":
+        stateIcon = "⚪";
+        stateText = "not planned";
+        break;
+      case "duplicate":
+        stateIcon = "⚪";
+        stateText = "duplicate";
+        break;
+      default:
+        stateIcon = "🔴";
+        stateText = "closed";
+        break;
+    }
+  }
 
   const cardBuilder = CardService.newCardBuilder()
     .setHeader(
       CardService.newCardHeader()
         .setTitle(cardTitle)
-        .setSubtitle(`${stateIcon} Issue #${data.number} • ${data.state}`)
+        .setSubtitle(`${stateIcon} Issue #${data.number} • ${stateText}`)
         .setImageUrl(GITHUB_LOGO),
     )
     .addSection(

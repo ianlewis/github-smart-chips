@@ -46,6 +46,7 @@ export interface GitHubIssue {
   number: number;
   title: string;
   state: string;
+  state_reason?: "completed" | "not_planned" | "duplicate" | "reopened";
   body?: string;
   created_at: string;
   user: GitHubUser;
