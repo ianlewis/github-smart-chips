@@ -111,6 +111,7 @@ export interface GitHubProject {
 export interface GitHubURLInfo {
   owner: string;
   repo?: string;
+  path?: string;
   number?: number;
   org?: string;
   type: "repository" | "issue" | "pull_request" | "user" | "project";

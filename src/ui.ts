@@ -189,6 +189,7 @@ export function createPullRequestCard(
  */
 export function createRepositoryCard(
   data: GitHubRepository,
+  title = data.full_name,
 ): GoogleAppsScript.Card_Service.Card {
   const subtitle = data.description || "GitHub Repository";
 
@@ -201,7 +202,7 @@ export function createRepositoryCard(
   const cardBuilder = CardService.newCardBuilder()
     .setHeader(
       CardService.newCardHeader()
-        .setTitle(data.full_name)
+        .setTitle(title)
         .setSubtitle(subtitle)
         .setImageUrl(GITHUB_LOGO),
     )

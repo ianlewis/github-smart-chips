@@ -76,6 +76,7 @@ describe("parseGitHubURL", () => {
     expect(result).not.toBeNull();
     expect(result?.owner).toBe("owner");
     expect(result?.repo).toBe("repo");
+    expect(result?.path).toBe("src/index.js");
     expect(result?.type).toBe("repository");
   });
 

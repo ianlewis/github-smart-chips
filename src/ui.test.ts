@@ -484,6 +484,28 @@ describe("createRepositoryCard", () => {
     expect(CardService.newCardBuilder).toHaveBeenCalled();
     expect(mockCardBuilder.build).toHaveBeenCalled();
   });
+
+  it("should use custom title for repository card", () => {
+    const data: GitHubRepository = {
+      name: "hello-world",
+      full_name: "octocat/hello-world",
+      description: "A test repository",
+      owner: {
+        login: "octocat",
+        avatar_url: "",
+        html_url: "",
+      },
+      private: false,
+      stargazers_count: 100,
+      forks_count: 25,
+      updated_at: "2023-01-01T00:00:00Z",
+      html_url: "https://github.com/octocat/hello-world",
+    };
+
+    createRepositoryCard(data, "src/addon.ts");
+
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("src/addon.ts");
+  });
 });
 
 describe("createUserCard", () => {

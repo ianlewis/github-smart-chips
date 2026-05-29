@@ -61,7 +61,7 @@ export function onLinkPreview(
         if (!repo) {
           break;
         }
-        card = createRepositoryCard(repo);
+        card = createRepositoryCard(repo, urlInfo.path);
       }
       break;
     }
