@@ -50,11 +50,11 @@ export function createIssueCard(
         stateText = "completed";
         break;
       case "not_planned":
-        stateIcon = "⚪";
+        stateIcon = "⊘";
         stateText = "not planned";
         break;
       case "duplicate":
-        stateIcon = "⚪";
+        stateIcon = "⊘";
         stateText = "duplicate";
         break;
       default:

@@ -241,7 +241,7 @@ describe("createIssueCard", () => {
     createIssueCard(data);
 
     expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
-      "⚪ Issue #123 • not planned",
+      "⊘ Issue #123 • not planned",
     );
   });
 
@@ -278,7 +278,7 @@ describe("createIssueCard", () => {
     createIssueCard(data);
 
     expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
-      "⚪ Issue #123 • duplicate",
+      "⊘ Issue #123 • duplicate",
     );
   });
 
