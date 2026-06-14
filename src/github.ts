@@ -29,6 +29,7 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
   const pullPattern = /github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
   const orgProjectPattern = /github\.com\/orgs\/([^/]+)\/projects\/(\d+)/;
   const userProjectPattern = /github\.com\/users\/([^/]+)\/projects\/(\d+)/;
+  const filePattern = /github\.com\/([^/]+)\/([^/]+)\/blob\/[^/]+\/([^?#]+)/;
   const repoPattern =
     /github\.com\/([^/]+)\/([^/]+)(\/(tree|blob)\/([^/]+)\/?|\/?$)/;
   const userPattern = /github\.com\/([^/]+)\/?$/;
@@ -69,6 +70,16 @@ export function parseGitHubURL(url: string): GitHubURLInfo | null {
       owner: match[1],
       number: parseInt(match[2], 10),
       type: "project",
+    };
+  }
+
+  match = url.match(filePattern);
+  if (match) {
+    return {
+      owner: match[1],
+      repo: match[2],
+      path: decodeURIComponent(match[3]),
+      type: "repository",
     };
   }
 
