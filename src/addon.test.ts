@@ -233,7 +233,7 @@ describe("onLinkPreview", () => {
       expect((result as any[])[0].id).toBe("mock-card");
     });
 
-    it("should use file path as title for blob URLs", () => {
+    it("should use repository name and file path as title for blob URLs", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (globalThis as any).UrlFetchApp.fetch.mockReturnValueOnce({
         getResponseCode: () => 200,
@@ -265,7 +265,42 @@ describe("onLinkPreview", () => {
 
       onLinkPreview(event);
 
-      expect(mockCardHeader.setTitle).toHaveBeenCalledWith("src/addon.ts");
+      expect(mockCardHeader.setTitle).toHaveBeenCalledWith("repo/src/addon.ts");
+    });
+
+    it("should use repository name and base file name for long blob paths", () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).UrlFetchApp.fetch.mockReturnValueOnce({
+        getResponseCode: () => 200,
+        getContentText: () =>
+          JSON.stringify({
+            name: "repo",
+            full_name: "owner/repo",
+            owner: {
+              login: "owner",
+              avatar_url: "",
+              html_url: "",
+            },
+            description: "Test repo",
+            private: false,
+            stargazers_count: 0,
+            forks_count: 0,
+            updated_at: "2023-01-01T00:00:00Z",
+            html_url: "https://github.com/owner/repo",
+          }),
+      });
+
+      const event = {
+        docs: {
+          matchedUrl: {
+            url: "https://github.com/owner/repo/blob/main/src/components/smart/chips/preview/github/repository/addon.ts",
+          },
+        },
+      };
+
+      onLinkPreview(event);
+
+      expect(mockCardHeader.setTitle).toHaveBeenCalledWith("repo - addon.ts");
     });
   });
 

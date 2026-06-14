@@ -25,6 +25,24 @@ import {
 } from "./ui.js";
 import { GITHUB_LOGO } from "./logos.js";
 
+function createRepositoryTitle(
+  repoName: string,
+  path?: string,
+  maxLength = 60,
+): string {
+  if (!path) {
+    return repoName;
+  }
+
+  const fullPathTitle = `${repoName}/${path}`;
+  if (fullPathTitle.length < maxLength) {
+    return fullPathTitle;
+  }
+
+  const baseName = path.split("/").pop() || path;
+  return `${repoName} - ${baseName}`;
+}
+
 /**
  * Handle link preview requests for GitHub URLs
  */
@@ -61,7 +79,10 @@ export function onLinkPreview(
         if (!repo) {
           break;
         }
-        card = createRepositoryCard(repo, urlInfo.path);
+        const title = urlInfo.path
+          ? createRepositoryTitle(repo.name, urlInfo.path)
+          : undefined;
+        card = createRepositoryCard(repo, title);
       }
       break;
     }
