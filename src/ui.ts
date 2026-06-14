@@ -30,7 +30,7 @@ import { GITHUB_LOGO } from "./logos.js";
 export function createIssueCard(
   data: GitHubIssue,
 ): GoogleAppsScript.Card_Service.Card {
-  const cardTitle = `${data.repo.full_name}#${data.number}: ${data.title}`;
+  const cardTitle = `#${data.number}: ${data.title}`;
   const repoUrl = `https://github.com/${data.repo.full_name}`;
   const itemUrl = `${repoUrl}/issues/${data.number}`;
 
@@ -102,7 +102,7 @@ export function createIssueCard(
 export function createPullRequestCard(
   data: GitHubPullRequest,
 ): GoogleAppsScript.Card_Service.Card {
-  const cardTitle = `${data.base.repo.full_name}#${data.number}: ${data.title}`;
+  const cardTitle = `#${data.number}: ${data.title}`;
   const repoUrl = `https://github.com/${data.base.repo.full_name}`;
   const itemUrl = `${repoUrl}/pull/${data.number}`;
 
