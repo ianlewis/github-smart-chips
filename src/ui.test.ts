@@ -171,6 +171,117 @@ describe("createIssueCard", () => {
     );
   });
 
+  it("should show completed for a completed issue", () => {
+    const data: GitHubIssue = {
+      repo: {
+        name: "hello-world",
+        full_name: "octocat/hello-world",
+        owner: {
+          login: "octocat",
+          avatar_url: "",
+          html_url: "",
+        },
+        private: false,
+        stargazers_count: 0,
+        forks_count: 0,
+        updated_at: "",
+        html_url: "",
+      },
+      number: 123,
+      title: "Completed Issue",
+      state: "closed",
+      state_reason: "completed",
+      body: "This issue has been resolved",
+      created_at: "2023-01-01T00:00:00Z",
+      user: {
+        login: "testuser",
+        avatar_url: "https://github.com/testuser.png",
+        html_url: "https://github.com/testuser",
+      },
+      labels: [],
+    };
+
+    createIssueCard(data);
+
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
+      "🟣 Issue #123 • completed",
+    );
+  });
+
+  it("should show not planned for a not planned issue", () => {
+    const data: GitHubIssue = {
+      repo: {
+        name: "hello-world",
+        full_name: "octocat/hello-world",
+        owner: {
+          login: "octocat",
+          avatar_url: "",
+          html_url: "",
+        },
+        private: false,
+        stargazers_count: 0,
+        forks_count: 0,
+        updated_at: "",
+        html_url: "",
+      },
+      number: 123,
+      title: "Not Planned Issue",
+      state: "closed",
+      state_reason: "not_planned",
+      body: "This issue will not be worked on",
+      created_at: "2023-01-01T00:00:00Z",
+      user: {
+        login: "testuser",
+        avatar_url: "https://github.com/testuser.png",
+        html_url: "https://github.com/testuser",
+      },
+      labels: [],
+    };
+
+    createIssueCard(data);
+
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
+      "⊘ Issue #123 • not planned",
+    );
+  });
+
+  it("should show duplicate for a duplicate issue", () => {
+    const data: GitHubIssue = {
+      repo: {
+        name: "hello-world",
+        full_name: "octocat/hello-world",
+        owner: {
+          login: "octocat",
+          avatar_url: "",
+          html_url: "",
+        },
+        private: false,
+        stargazers_count: 0,
+        forks_count: 0,
+        updated_at: "",
+        html_url: "",
+      },
+      number: 123,
+      title: "Duplicate Issue",
+      state: "closed",
+      state_reason: "duplicate",
+      body: "This issue duplicates another issue",
+      created_at: "2023-01-01T00:00:00Z",
+      user: {
+        login: "testuser",
+        avatar_url: "https://github.com/testuser.png",
+        html_url: "https://github.com/testuser",
+      },
+      labels: [],
+    };
+
+    createIssueCard(data);
+
+    expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
+      "⊘ Issue #123 • duplicate",
+    );
+  });
+
   it("should handle issue with no body", () => {
     const data: GitHubIssue = {
       repo: {
