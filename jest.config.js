@@ -29,7 +29,7 @@ export default {
   resolver: "ts-jest-resolver",
   testEnvironment: "node",
   testMatch: ["**/*.test.ts"],
-  testPathIgnorePatterns: ["/node_modules/", "/lib/", "/dist/"],
+  testPathIgnorePatterns: ["/lib/", "/node_modules/", "/dist/"],
   transform: {
     "^.+\\.tsx?$": [
       "ts-jest",

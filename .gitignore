@@ -6,9 +6,15 @@ node_modules/
 .bin/
 .venv/
 .aqua/
+.uv/
 
 # SARIF files
 *.sarif.json
+
+# Python cache files
+__pycache__/
+*.egg-info/
+*.pyc
 
 # Coverage files
 coverage
@@ -106,13 +112,7 @@ typings/
 .DS_Store
 Thumbs.db
 
-# Claude local settings.
-.claude
-
 # Ignore built ts files
 __tests__/runner/*
-lib/
-dist/
-
-# Static site output
-_site/
+lib/**/*
+dist/**/*
