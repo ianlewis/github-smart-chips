@@ -125,9 +125,7 @@ describe("createIssueCard", () => {
 
     expect(CardService.newCardBuilder).toHaveBeenCalled();
     expect(mockCardBuilder.setHeader).toHaveBeenCalled();
-    expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
-      "octocat/hello-world#123: Test Issue",
-    );
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("#123: Test Issue");
     expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
       "🟢 Issue #123 • open",
     );
@@ -260,9 +258,7 @@ describe("createPullRequestCard", () => {
     createPullRequestCard(data);
 
     expect(CardService.newCardBuilder).toHaveBeenCalled();
-    expect(mockCardHeader.setTitle).toHaveBeenCalledWith(
-      "octocat/hello-world#456: Test PR",
-    );
+    expect(mockCardHeader.setTitle).toHaveBeenCalledWith("#456: Test PR");
     expect(mockCardHeader.setSubtitle).toHaveBeenCalledWith(
       "🟢 Pull Request #456 • open",
     );
