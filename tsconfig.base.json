@@ -6,6 +6,7 @@
     "declarationMap": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true, // isolatedModules is required by ts-jest
     "lib": [
       "ES2022",
       "DOM" // NOTE: DOM is only required to avoid errors with some transitive dependencies.
@@ -16,14 +17,13 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "outDir": "./lib",
     "pretty": true,
     "resolveJsonModule": true,
-    "rootDir": "./src",
+    "skipLibCheck": true, // TODO(#109): Remove this option when possible.
     "strict": true,
     "strictNullChecks": true,
     "target": "ES2022",
-    "types": ["google-apps-script"],
-    "isolatedModules": true // isolatedModules is required by ts-jest
+    "rootDir": "./src",
+    "types": ["google-apps-script"]
   }
 }
