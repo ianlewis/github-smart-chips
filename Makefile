@@ -197,7 +197,7 @@ yaml-format: $(REPO_ROOT)/node_modules/.installed ## Format YAML files.
 		$${files}
 
 .PHONY: ts-format
-ts-format: node_modules/.installed ## Format YAML files.
+ts-format: $(REPO_ROOT)/node_modules/.installed ## Format YAML files.
 	@echo "Formatting TypeScript files..."
 	loglevel="log"
 	if [ -n "$(DEBUG_LOGGING)" ]; then
